@@ -1,29 +1,52 @@
-/// @file ItemsListViewModel.cs
-/// @brief Items list page view model
-/// @author Alan Glowacz
-/// @date 2025
-
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using StarterApp.Database.Models;
+using StarterApp.Services;
 using System.Collections.ObjectModel;
 
 namespace StarterApp.ViewModels;
 
 public partial class ItemsListViewModel : BaseViewModel
 {
+    private readonly IItemService _itemService;
+
     [ObservableProperty]
-    private ObservableCollection<string> items = new();
+    private ObservableCollection<Item> items = new();
 
     public ItemsListViewModel()
     {
         Title = "Items List";
+    }
 
-        Items = new ObservableCollection<string>
+    public ItemsListViewModel(IItemService itemService)
+    {
+        _itemService = itemService;
+        Title = "Items List";
+    }
+
+    [RelayCommand]
+    private async Task LoadItemsAsync()
+    {
+        try
         {
-            "Item 1",
-            "Item 2",
-            "Item 3",
-            "Item 4",
-            "Item 5"
-        };
+            IsBusy = true;
+            ClearError();
+
+            var fetchedItems = await _itemService.GetItemsAsync();
+
+            Items.Clear();
+            foreach (var item in fetchedItems)
+            {
+                Items.Add(item);
+            }
+        }
+        catch (Exception ex)
+        {
+            SetError($"Failed to load items: {ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }
