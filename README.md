@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: "StarterApp readme"
 parent: StarterApp
@@ -89,3 +90,6 @@ Before using this app, ensure you have:
 
 For a comprehensive guide on using this app and understanding its architecture, see the
 [MAUI + MVVM + Database Tutorial](https://edinburgh-napier.github.io/SET09102/tutorials/csharp/maui-mvvm-database/).
+=======
+# RentalApp
+>>>>>>> 246494c84e10338d5f66597a961f4ed7370a1e39
