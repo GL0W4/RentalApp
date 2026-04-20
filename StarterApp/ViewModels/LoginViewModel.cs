@@ -9,50 +9,44 @@ using StarterApp.Services;
 
 namespace StarterApp.ViewModels;
 
-/// @brief View model for the login page that handles user authentication
-/// @details Manages login form data, validation, and authentication process
+/// @brief View model for the login page
+/// @details Handles user authentication, validation, loading state, error reporting, and navigation
 /// @extends BaseViewModel
 public partial class LoginViewModel : BaseViewModel
 {
-    /// @brief Authentication service for managing user login
+    /// @brief Authentication service for login operations
     private readonly IAuthenticationService _authService;
-    
-    /// @brief Navigation service for managing page navigation
+
+    /// @brief Navigation service for page navigation
     private readonly INavigationService _navigationService;
 
-    /// @brief The user's email address
-    /// @details Observable property bound to the email input field
+    /// @brief User email input
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     private string email = string.Empty;
 
-    /// @brief The user's password
-    /// @details Observable property bound to the password input field
+    /// @brief User password input
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     private string password = string.Empty;
 
-    /// @brief Whether to remember the user's login credentials
-    /// @details Observable property bound to the remember me checkbox
+    /// @brief Remember-me option
     [ObservableProperty]
     private bool rememberMe;
 
-    /// @brief Indicates whether a login operation is in progress
-    /// @details Observable property that notifies the LoginCommand when changed
+    /// @brief Password visibility toggle
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
-    private bool _isBusy;
+    private bool isPasswordVisible;
 
     /// @brief Default constructor for design-time support
-    /// @details Sets the title to "Login"
     public LoginViewModel()
     {
-        // Default constructor for design time support
         Title = "Login";
     }
 
     /// @brief Initializes a new instance of the LoginViewModel class
     /// @param authService The authentication service instance
     /// @param navigationService The navigation service instance
-    /// @details Sets up the required services and initializes the title
     public LoginViewModel(IAuthenticationService authService, INavigationService navigationService)
     {
         _authService = authService;
@@ -60,25 +54,34 @@ public partial class LoginViewModel : BaseViewModel
         Title = "Login";
     }
 
-    /// @brief Performs user login authentication
-    /// @details Relay command that validates input and attempts to authenticate the user
-    /// @return A task representing the asynchronous login operation
-    [RelayCommand]
+    /// @brief Determines whether login can execute
+    /// @returns True if the form is valid and not busy
+    private bool CanLogin()
+    {
+        return !IsBusy
+            && !string.IsNullOrWhiteSpace(Email)
+            && !string.IsNullOrWhiteSpace(Password);
+    }
+
+    /// @brief Attempts to authenticate the user
+    [RelayCommand(CanExecute = nameof(CanLogin))]
     private async Task LoginAsync()
     {
         if (IsBusy)
             return;
 
+        ClearError();
+
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
-            SetError("Please enter both email and password");
+            SetError("Please enter both email and password.");
             return;
         }
 
         try
         {
             IsBusy = true;
-            ClearError();
+            LoginCommand.NotifyCanExecuteChanged();
 
             var result = await _authService.LoginAsync(Email, Password);
 
@@ -88,7 +91,7 @@ public partial class LoginViewModel : BaseViewModel
             }
             else
             {
-                SetError(result.Message);
+                SetError(result.Message ?? "Login failed.");
             }
         }
         catch (Exception ex)
@@ -98,26 +101,31 @@ public partial class LoginViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+            LoginCommand.NotifyCanExecuteChanged();
         }
     }
 
+    /// @brief Toggles password visibility
+    [RelayCommand]
+    private void TogglePasswordVisibility()
+    {
+        IsPasswordVisible = !IsPasswordVisible;
+    }
+
     /// @brief Navigates to the registration page
-    /// @details Relay command that navigates to the user registration page
-    /// @return A task representing the asynchronous navigation operation
     [RelayCommand]
     private async Task NavigateToRegisterAsync()
     {
         await _navigationService.NavigateToAsync("RegisterPage");
     }
 
-    /// @brief Handles forgot password functionality
-    /// @details Relay command that displays a placeholder message for forgot password
-    /// @return A task representing the asynchronous operation
-    /// @todo Implement actual forgot password functionality
+    /// @brief Displays forgot-password placeholder
     [RelayCommand]
     private async Task ForgotPasswordAsync()
     {
-        // TODO: Implement forgot password functionality
-        await Application.Current.MainPage.DisplayAlert("Info", "Forgot password functionality not implemented yet", "OK");
+        await Application.Current.MainPage.DisplayAlert(
+            "Forgot Password",
+            "Password reset functionality will be implemented in a future version.",
+            "OK");
     }
 }
