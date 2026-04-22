@@ -2,12 +2,8 @@
 <ContentPage x:Class="StarterApp.Views.MainPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:StarterApp.ViewModels"
              Title="{Binding Title}">
 
-    <ContentPage.BindingContext>
-        <vm:MainViewModel />
-    </ContentPage.BindingContext>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Profile" 
@@ -157,38 +153,16 @@
                         </Grid>
                     </Border>
 
-                    <!-- Items Card -->
-                    <Border BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
-                            Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
-                            StrokeThickness="1"
-                            Padding="20"
-                            HeightRequest="80">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="12" />
-                        </Border.StrokeShape>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding NavigateToItemsListCommand}" />
-                    </Border.GestureRecognizers>
-                    <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Label Grid.Column="0"
-                        Text="📦"
-                        FontSize="24"
-                        VerticalOptions="Center" />
-                    <StackLayout Grid.Column="1" Margin="15,0,0,0" VerticalOptions="Center">
-                        <Label Text="Browse Items"
-                            FontSize="16"
-                            FontAttributes="Bold" />
-                        <Label Text="View available items"
-                            FontSize="12"
-                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
-                    </StackLayout>
-                        <Label Grid.Column="2"
-                            Text=">"
-                            FontSize="18"
-                            VerticalOptions="Center"
-                            TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray600}}" />
-                        </Grid>
-                    </Border>
+                    <Button Text="Browse Items"
+                        Command="{Binding NavigateToItemsListCommand}"
+                        HeightRequest="50"
+                        FontAttributes="Bold"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                        TextColor="White"
+                        CornerRadius="12" />
+
+                    <Button Text="Test Items Page"
+                        Command="{Binding NavigateToItemsListCommand}" />
 
                     <!-- Users Card (Only visible for admins) -->
                     <Border BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"

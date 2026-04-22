@@ -8,5 +8,6 @@ public partial class AppShell : Shell
 	{	
 		BindingContext = viewModel;
 		InitializeComponent();
+
 	}
 }

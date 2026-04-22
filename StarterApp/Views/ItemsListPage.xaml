@@ -17,6 +17,12 @@
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
 
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenItemDetailCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+
                         <VerticalStackLayout Spacing="6">
                             <Label Text="{Binding Title}"
                                    FontSize="18"

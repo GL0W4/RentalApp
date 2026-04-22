@@ -4,6 +4,7 @@ using StarterApp.Database.Data;
 using StarterApp.Views;
 using System.Diagnostics;
 using StarterApp.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace StarterApp;
 
@@ -44,11 +45,36 @@ public static class MauiProgram
         builder.Services.AddSingleton<TempViewModel>();
         builder.Services.AddTransient<TempPage>();
         builder.Services.AddSingleton<IItemService, ItemService>();
+        builder.Services.AddTransient<ItemDetailViewModel>();
+        builder.Services.AddTransient<ItemDetailPage>();
 
-#if DEBUG
+        #if DEBUG
         builder.Logging.AddDebug();
-#endif
+        #endif
 
-        return builder.Build();
+        var app = builder.Build();
+
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            Debug.WriteLine($"DB Provider: {dbContext.Database.ProviderName}");
+            Debug.WriteLine($"Can connect to DB: {dbContext.Database.CanConnect()}");
+
+            var pending = dbContext.Database.GetPendingMigrations().ToList();
+            Debug.WriteLine($"Pending migrations: {string.Join(",", pending)}");
+
+            dbContext.Database.Migrate();
+
+            var applied = dbContext.Database.GetAppliedMigrations().ToList();
+            Debug.WriteLine($"Applied migrations: {string.Join(",", applied)}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error applying migrations: {ex.Message}");
+        }
+
+        return app;
     }
 }

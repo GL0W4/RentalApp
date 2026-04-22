@@ -9,18 +9,23 @@ namespace StarterApp.ViewModels;
 public partial class ItemsListViewModel : BaseViewModel
 {
     private readonly IItemService _itemService;
+    private readonly INavigationService _navigationService;
 
     [ObservableProperty]
     private ObservableCollection<Item> items = new();
+
+    [ObservableProperty]
+    private Item? selectedItem;
 
     public ItemsListViewModel()
     {
         Title = "Items List";
     }
 
-    public ItemsListViewModel(IItemService itemService)
+    public ItemsListViewModel(IItemService itemService, INavigationService navigationService)
     {
         _itemService = itemService;
+        _navigationService = navigationService;
         Title = "Items List";
     }
 
@@ -48,5 +53,15 @@ public partial class ItemsListViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task OpenItemDetailAsync(Item item)
+    {
+        if (item is null)
+            return;
+
+        SelectedItem = item;
+        await _navigationService.NavigateToAsync(nameof(Views.ItemDetailPage));
     }
 }
