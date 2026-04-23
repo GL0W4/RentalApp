@@ -29,8 +29,8 @@ jobs:
       - name: Install MAUI Android workload
         run: dotnet workload install maui-android
 
-      - name: Restore StarterApp
-        run: dotnet restore StarterApp/StarterApp.csproj
+      - name: Restore solution
+        run: dotnet restore StarterApp.sln
 
       - name: Build StarterApp.Database
         run: dotnet build StarterApp.Database/StarterApp.Database.csproj -c Release --no-restore
