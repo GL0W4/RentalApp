@@ -40,8 +40,8 @@ public class AuthenticationService : IAuthenticationService
 
             if (!response.IsSuccessStatusCode)
             {
-                var errorBody = await response.Content.ReadAsStringAsync();
-                return new AuthenticationResult(false, $"Login failed: {errorBody}");
+                var message = await ExtractErrorMessageAsync(response, "Invalid email or password.", true);
+    return new AuthenticationResult(false, message);
             }
 
             var result = await response.Content.ReadFromJsonAsync<AuthTokenResponse>();
@@ -90,8 +90,8 @@ public class AuthenticationService : IAuthenticationService
 
             if (!response.IsSuccessStatusCode)
             {
-                var errorBody = await response.Content.ReadAsStringAsync();
-                return new AuthenticationResult(false, $"Registration failed: {errorBody}");
+                var message = await ExtractErrorMessageAsync(response, "Invalid email or password.", false);
+                return new AuthenticationResult(false, message);
             }
 
             return new AuthenticationResult(true, "Registration successful");
@@ -149,4 +149,59 @@ public class AuthenticationService : IAuthenticationService
         public DateTime ExpiresAt { get; set; }
         public int UserId { get; set; }
     }
+
+    private async Task<string> ExtractErrorMessageAsync(
+    HttpResponseMessage response,
+    string fallbackMessage,
+    bool isLoginFlow)
+{
+    try
+    {
+        var errorBody = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(errorBody))
+            return fallbackMessage;
+
+        if (errorBody.Contains("email already exists", StringComparison.OrdinalIgnoreCase) ||
+            errorBody.Contains("already exists", StringComparison.OrdinalIgnoreCase))
+        {
+            return "An account with this email already exists.";
+        }
+
+        if (errorBody.Contains("uppercase", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Password must contain at least one uppercase letter.";
+        }
+
+        if (errorBody.Contains("number", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Password must contain at least one number.";
+        }
+
+        if (errorBody.Contains("special character", StringComparison.OrdinalIgnoreCase) ||
+            errorBody.Contains("special", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Password must contain at least one special character.";
+        }
+
+        if (isLoginFlow &&
+            (errorBody.Contains("invalid", StringComparison.OrdinalIgnoreCase) ||
+             errorBody.Contains("unauthorized", StringComparison.OrdinalIgnoreCase)))
+        {
+            return "Invalid email or password.";
+        }
+
+        if (!isLoginFlow &&
+            errorBody.Contains("validation", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Please check your registration details and try again.";
+        }
+
+        return fallbackMessage;
+    }
+    catch
+    {
+        return fallbackMessage;
+    }
+}
 }
