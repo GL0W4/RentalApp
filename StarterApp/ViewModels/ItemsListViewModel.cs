@@ -10,6 +10,7 @@ public partial class ItemsListViewModel : BaseViewModel
 {
     private readonly IItemService _itemService;
     private readonly INavigationService _navigationService;
+    private readonly SelectedItemService _selectedItemService;
 
     [ObservableProperty]
     private ObservableCollection<Item> items = new();
@@ -22,10 +23,11 @@ public partial class ItemsListViewModel : BaseViewModel
         Title = "Items List";
     }
 
-    public ItemsListViewModel(IItemService itemService, INavigationService navigationService)
+    public ItemsListViewModel(IItemService itemService, INavigationService navigationService, SelectedItemService selectedItemService)
     {
         _itemService = itemService;
         _navigationService = navigationService;
+        _selectedItemService = selectedItemService;
         Title = "Items List";
     }
 
@@ -62,6 +64,7 @@ public partial class ItemsListViewModel : BaseViewModel
             return;
 
         SelectedItem = item;
+        _selectedItemService.SelectedItem = item;
         await _navigationService.NavigateToAsync(nameof(Views.ItemDetailPage));
     }
 }

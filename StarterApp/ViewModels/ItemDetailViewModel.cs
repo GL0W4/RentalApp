@@ -10,12 +10,21 @@ namespace StarterApp.ViewModels;
 
 public partial class ItemDetailViewModel : BaseViewModel
 {
+    private readonly SelectedItemService _selectedItemService;
+
     [ObservableProperty]
     private Item? item;
 
-    public ItemDetailViewModel()
+    public ItemDetailViewModel(SelectedItemService selectedItemService)
     {
+        _selectedItemService = selectedItemService;
         Title = "Item Detail";
+        Item = _selectedItemService.SelectedItem;
+
+        if (Item != null)
+        {
+            Title = Item.Title;
+        }
     }
 
     public void SetItem(Item selectedItem)

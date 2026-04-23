@@ -47,6 +47,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IItemService, ItemService>();
         builder.Services.AddTransient<ItemDetailViewModel>();
         builder.Services.AddTransient<ItemDetailPage>();
+        builder.Services.AddSingleton<SelectedItemService>();
 
         #if DEBUG
         builder.Logging.AddDebug();
