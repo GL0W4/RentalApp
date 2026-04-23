@@ -43,7 +43,25 @@ public class ItemService : IItemService
         if (!response.IsSuccessStatusCode)
         {
             var errorBody = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Create item failed: {response.StatusCode} - {errorBody}");
+            
+            if (errorBody.Contains("category", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Invalid category selected. Please choose a valid category.");
+            }
+
+            if (errorBody.Contains("latitude", StringComparison.OrdinalIgnoreCase) || 
+                errorBody.Contains("longitude", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Invalid location coordinates. Please ensure latitude is between -90 and 90, and longitude is between -180 and 180.");
+            }
+
+            if (errorBody.Contains("unauthorized", StringComparison.OrdinalIgnoreCase) || 
+                errorBody.Contains("token", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Your session has expired. Please log in again.");
+            }
+
+            throw new Exception("Failed to create item.");
         }
 
         var createdItem = await response.Content.ReadFromJsonAsync<Item>();
