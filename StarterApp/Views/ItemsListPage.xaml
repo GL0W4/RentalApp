@@ -6,40 +6,48 @@
 
     <RefreshView IsRefreshing="{Binding IsBusy}"
                  Command="{Binding LoadItemsCommand}">
-        <CollectionView ItemsSource="{Binding Items}"
-                        Margin="20">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border StrokeThickness="1"
-                            Padding="12"
-                            Margin="0,0,0,10">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="8" />
-                        </Border.StrokeShape>
+        <Grid Padding="20" RowDefinitions="Auto,*" RowSpacing="15">
 
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer
-                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenItemDetailCommand}"
-                                CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>
+            <Button Grid.Row="0"
+                    Text="Create Item"
+                    Command="{Binding NavigateToCreateItemCommand}" />
 
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="{Binding Title}"
-                                   FontSize="18"
-                                   FontAttributes="Bold" />
-                            <Label Text="{Binding Description}"
-                                   FontSize="13" />
-                            <Label Text="{Binding Category}"
-                                   FontSize="12" />
-                            <Label Text="{Binding OwnerName, StringFormat='Owner: {0}'}"
-                                   FontSize="12" />
-                            <Label Text="{Binding DailyRate, StringFormat='£{0:F2} / day'}"
-                                   FontSize="14"
-                                   FontAttributes="Bold" />
-                        </VerticalStackLayout>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding Items}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeThickness="1"
+                                Padding="12"
+                                Margin="0,0,0,10">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenItemDetailCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="{Binding Title}"
+                                       FontSize="18"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding Description}"
+                                       FontSize="13" />
+                                <Label Text="{Binding Category}"
+                                       FontSize="12" />
+                                <Label Text="{Binding OwnerName, StringFormat='Owner: {0}'}"
+                                       FontSize="12" />
+                                <Label Text="{Binding DailyRate, StringFormat='£{0:F2} / day'}"
+                                       FontSize="14"
+                                       FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
     </RefreshView>
 </ContentPage>

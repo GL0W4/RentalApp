@@ -23,8 +23,11 @@ public partial class ItemsListViewModel : BaseViewModel
         _navigationService = navigationService;
         Title = "Items List";
     }
-
-    
+    [RelayCommand]
+    private async Task NavigateToCreateItemAsync()
+    {
+        await _navigationService.NavigateToAsync("CreateItemPage");
+    }
 
     [RelayCommand]
     public async Task LoadItemsAsync()
