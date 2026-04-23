@@ -1,21 +1,36 @@
 using StarterApp.Database.Models;
-using StarterApp.ViewModels;
+using StarterApp.Services;
 
 namespace StarterApp.Views;
 
-public partial class ItemDetailPage : ContentPage
+public partial class ItemDetailPage : ContentPage, IQueryAttributable
 {
-    private readonly ItemDetailViewModel _viewModel;
+    private readonly IItemService _itemService;
 
-    public ItemDetailPage(ItemDetailViewModel viewModel)
+    public Item? Item { get; set; }
+
+    public string PageTitle => Item?.Title ?? "Item Detail";
+
+    public ItemDetailPage()
     {
         InitializeComponent();
-        BindingContext = viewModel;
-        _viewModel = viewModel;
+
+        _itemService = Application.Current!.Handler!.MauiContext!.Services.GetService(typeof(IItemService)) as IItemService
+            ?? throw new InvalidOperationException("IItemService not found.");
+
+        BindingContext = this;
     }
 
-    public void SetItem(Item item)
+    public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        _viewModel.SetItem(item);
+        if (query.TryGetValue("itemId", out var value) &&
+            int.TryParse(value?.ToString(), out var itemId))
+        {
+            var items = await _itemService.GetItemsAsync();
+            Item = items.FirstOrDefault(i => i.Id == itemId);
+
+            OnPropertyChanged(nameof(Item));
+            OnPropertyChanged(nameof(PageTitle));
+        }
     }
 }

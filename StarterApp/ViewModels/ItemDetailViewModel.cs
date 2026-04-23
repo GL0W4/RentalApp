@@ -1,35 +1,100 @@
-/// @file ItemDetailViewModel.cs
-/// @brief View model for displaying a single item
-/// @author Alan Glowacz
-/// @date 2025
-
-using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using StarterApp.Database.Models;
+using StarterApp.Services;
+using System.ComponentModel;
 
 namespace StarterApp.ViewModels;
 
-public partial class ItemDetailViewModel : BaseViewModel
+public partial class ItemDetailViewModel : INotifyPropertyChanged
 {
-    private readonly SelectedItemService _selectedItemService;
+    private readonly IItemService _itemService;
 
-    [ObservableProperty]
-    private Item? item;
+    private int _itemId;
+    private Item? _item;
+    private bool _isLoading;
+    private string _errorMessage = string.Empty;
 
-    public ItemDetailViewModel(SelectedItemService selectedItemService)
+    public ItemDetailViewModel(IItemService itemService)
     {
-        _selectedItemService = selectedItemService;
-        Title = "Item Detail";
-        Item = _selectedItemService.SelectedItem;
+        _itemService = itemService;
+    }
 
-        if (Item != null)
+    public int ItemId
+    {
+        get => _itemId;
+        set
         {
-            Title = Item.Title;
+            _itemId = value;
+            OnPropertyChanged();
+            _ = Task.Run(LoadItemAsync);
         }
     }
 
-    public void SetItem(Item selectedItem)
+    public Item? Item
     {
-        Item = selectedItem;
-        Title = selectedItem.Title;
+        get => _item;
+        set
+        {
+            _item = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(PageTitle));
+        }
+    }
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set
+        {
+            _isLoading = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set
+        {
+            _errorMessage = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string PageTitle => Item?.Title ?? "Item Detail";
+
+    private async Task LoadItemAsync()
+    {
+        System.Diagnostics.Debug.WriteLine($"ITEM DETAIL LOAD START: ItemId={ItemId}");
+
+        IsLoading = true;
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            var items = await _itemService.GetItemsAsync();
+            Item = items.FirstOrDefault(i => i.Id == ItemId);
+
+            if (Item == null)
+            {
+                ErrorMessage = "Item not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error loading item: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+        System.Diagnostics.Debug.WriteLine($"ITEM DETAIL LOAD RESULT: {(Item == null ? "NULL" : Item.Title)}");
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

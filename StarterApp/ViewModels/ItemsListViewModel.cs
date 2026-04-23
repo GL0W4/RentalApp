@@ -4,35 +4,30 @@ using StarterApp.Database.Models;
 using StarterApp.Services;
 using System.Collections.ObjectModel;
 
+
+
 namespace StarterApp.ViewModels;
 
 public partial class ItemsListViewModel : BaseViewModel
 {
     private readonly IItemService _itemService;
     private readonly INavigationService _navigationService;
-    private readonly SelectedItemService _selectedItemService;
 
     [ObservableProperty]
-    private ObservableCollection<Item> items = new();
+    private ObservableCollection<Item> items = new ObservableCollection<Item>();
 
-    [ObservableProperty]
-    private Item? selectedItem;
 
-    public ItemsListViewModel()
-    {
-        Title = "Items List";
-    }
-
-    public ItemsListViewModel(IItemService itemService, INavigationService navigationService, SelectedItemService selectedItemService)
+    public ItemsListViewModel(IItemService itemService, INavigationService navigationService)
     {
         _itemService = itemService;
         _navigationService = navigationService;
-        _selectedItemService = selectedItemService;
         Title = "Items List";
     }
 
+    
+
     [RelayCommand]
-    private async Task LoadItemsAsync()
+    public async Task LoadItemsAsync()
     {
         try
         {
@@ -40,8 +35,8 @@ public partial class ItemsListViewModel : BaseViewModel
             ClearError();
 
             var fetchedItems = await _itemService.GetItemsAsync();
-
             Items.Clear();
+
             foreach (var item in fetchedItems)
             {
                 Items.Add(item);
@@ -60,11 +55,10 @@ public partial class ItemsListViewModel : BaseViewModel
     [RelayCommand]
     private async Task OpenItemDetailAsync(Item item)
     {
-        if (item is null)
+        if (item == null)
             return;
 
-        SelectedItem = item;
-        _selectedItemService.SelectedItem = item;
-        await _navigationService.NavigateToAsync(nameof(Views.ItemDetailPage));
+        await Shell.Current.GoToAsync($"ItemDetailPage?itemId={item.Id}");
     }
+
 }
