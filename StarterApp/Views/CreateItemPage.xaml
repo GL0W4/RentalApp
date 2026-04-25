@@ -25,15 +25,15 @@
                     SelectedItem="{Binding SelectedCategory}" />
 
             <Entry Placeholder="Daily Rate"
-                   Text="{Binding DailyRate}"
+                   Text="{Binding DailyRateText}"
                    Keyboard="Numeric" />
 
             <Entry Placeholder="Latitude"
-                   Text="{Binding Latitude}"
+                   Text="{Binding LatitudeText}"
                    Keyboard="Numeric" />
 
             <Entry Placeholder="Longitude"
-                   Text="{Binding Longitude}"
+                   Text="{Binding LongitudeText}"
                    Keyboard="Numeric" />
 
             <Button Text="Save Item"

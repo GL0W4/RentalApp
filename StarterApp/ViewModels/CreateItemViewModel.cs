@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarterApp.Services;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace StarterApp.ViewModels;
 
@@ -23,13 +24,13 @@ public partial class CreateItemViewModel : BaseViewModel
     private ItemCategory? selectedCategory;
 
     [ObservableProperty]
-    private decimal dailyRate;
+    private string dailyRateText = string.Empty;
 
     [ObservableProperty]
-    private double latitude = 55.9533;
+    private string latitudeText = "55.9533";
 
     [ObservableProperty]
-    private double longitude = -3.1883;
+    private string longitudeText = "-3.1883";
 
     public CreateItemViewModel(IItemService itemService, INavigationService navigationService)
     {
@@ -67,7 +68,7 @@ public partial class CreateItemViewModel : BaseViewModel
         if (IsBusy)
             return;
 
-        if (!ValidateForm())
+        if (!ValidateForm(out var dailyRate, out var latitude, out var longitude))
             return;
 
         try
@@ -79,10 +80,10 @@ public partial class CreateItemViewModel : BaseViewModel
             {
                 Title = TitleText.Trim(),
                 Description = string.IsNullOrWhiteSpace(Description) ? null : Description.Trim(),
-                DailyRate = DailyRate,
+                DailyRate = dailyRate,
                 CategoryId = SelectedCategory!.Id,
-                Latitude = Latitude,
-                Longitude = Longitude
+                Latitude = latitude,
+                Longitude = longitude
             };
 
             await _itemService.AddItemAsync(request);
@@ -110,11 +111,21 @@ public partial class CreateItemViewModel : BaseViewModel
         await _navigationService.NavigateToAsync("ItemsListPage");
     }
 
-    private bool ValidateForm()
+    private bool ValidateForm(out decimal dailyRate, out double latitude, out double longitude)
     {
+        dailyRate = 0;
+        latitude = 0;
+        longitude = 0;
+
         if (string.IsNullOrWhiteSpace(TitleText))
         {
             SetError("Title is required.");
+            return false;
+        }
+
+        if (TitleText.Trim().Length < 5)
+        {
+            SetError("Title must be at least 5 characters long.");
             return false;
         }
 
@@ -124,19 +135,40 @@ public partial class CreateItemViewModel : BaseViewModel
             return false;
         }
 
-        if (DailyRate <= 0)
+        if (string.IsNullOrWhiteSpace(DailyRateText) || 
+            !decimal.TryParse(DailyRateText, NumberStyles.Number, CultureInfo.InvariantCulture, out dailyRate))
         {
-            SetError("Daily rate must be greater than 0.");
+            SetError("Daily rate must be a valid number.");
             return false;
         }
 
-        if (Latitude < -90 || Latitude > 90)
+        if (dailyRate <= 0)
+        {
+            SetError("Daily rate must be greater than zero.");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(LatitudeText) ||
+        !double.TryParse(LatitudeText, NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out latitude))
+        {
+            SetError("Latitude must be a valid number.");
+            return false;
+        }
+
+        if (latitude < -90 || latitude > 90)
         {
             SetError("Latitude must be between -90 and 90.");
             return false;
         }
 
-        if (Longitude < -180 || Longitude > 180)
+        if (string.IsNullOrWhiteSpace(LongitudeText) ||
+        !double.TryParse(LongitudeText, NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out longitude))
+        {
+            SetError("Longitude must be a valid number.");
+            return false;
+        }
+
+        if (longitude < -180 || longitude > 180)
         {
             SetError("Longitude must be between -180 and 180.");
             return false;
