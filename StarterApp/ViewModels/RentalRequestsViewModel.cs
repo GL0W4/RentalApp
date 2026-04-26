@@ -14,6 +14,22 @@ public partial class RentalRequestsViewModel : BaseViewModel
 
     [ObservableProperty]
     private ObservableCollection<RentalRequestItem> outgoingRentals = new();
+    
+    [ObservableProperty]
+    private ObservableCollection<string> statusFilters = new()
+    {
+        "All",
+        "Requested",
+        "Approved",
+        "Rejected",
+        "Out for Rent",
+        "Overdue",
+        "Returned",
+        "Completed"
+    };
+
+    [ObservableProperty]
+    private string selectedStatusFilter = "All";
 
     public RentalRequestsViewModel(IRentalService rentalService)
     {
@@ -46,20 +62,22 @@ public partial class RentalRequestsViewModel : BaseViewModel
     private async Task LoadRentalListsAsync()
     {
 
-            var incoming = await _rentalService.GetIncomingRentalsAsync();
-            var outgoing = await _rentalService.GetOutgoingRentalsAsync();
+        var status = SelectedStatusFilter == "All" ? null : SelectedStatusFilter;
 
-            IncomingRentals.Clear();
-            foreach (var rental in incoming)
-            {
-                IncomingRentals.Add(rental);
-            }
+        var incoming = await _rentalService.GetIncomingRentalsAsync(status);
+        var outgoing = await _rentalService.GetOutgoingRentalsAsync(status);
 
-            OutgoingRentals.Clear();
-            foreach (var rental in outgoing)
-            {
-                OutgoingRentals.Add(rental);
-            }
+        IncomingRentals.Clear();
+        foreach (var rental in incoming)
+        {
+            IncomingRentals.Add(rental);
+        }
+
+        OutgoingRentals.Clear();
+        foreach (var rental in outgoing)
+        {
+            OutgoingRentals.Add(rental);
+        }
     }
 
     [RelayCommand]
@@ -69,6 +87,15 @@ public partial class RentalRequestsViewModel : BaseViewModel
             return;
 
         await UpdateRentalStatusAsync(rental, "Approved");
+    }
+
+    [RelayCommand]
+    private async Task RejectRentalAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await UpdateRentalStatusAsync(rental, "Rejected");
     }
 
     private async Task UpdateRentalStatusAsync(RentalRequestItem rental, string status)
@@ -109,5 +136,40 @@ public partial class RentalRequestsViewModel : BaseViewModel
         }
 
         
+    }
+
+    [RelayCommand]
+    private async Task MarkOutForRentAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await UpdateRentalStatusAsync(rental, "Out for Rent");
+    }
+
+    [RelayCommand]
+    private async Task MarkReturnedAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await UpdateRentalStatusAsync(rental, "Returned");
+    }
+
+    [RelayCommand]
+    private async Task CompleteRentalAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await UpdateRentalStatusAsync(rental, "Completed");
+    }
+
+    partial void OnSelectedStatusFilterChanged(string value)
+    {
+        if (!IsBusy)
+        {
+            LoadRentalsCommand.Execute(null);
+        }
     }
 }

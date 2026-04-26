@@ -15,6 +15,14 @@
                    FontSize="22"
                    FontAttributes="Bold" />
 
+            <Label Text="Filter by Status"
+                   FontSize="14"
+                   FontAttributes="Bold" />
+
+            <Picker Title="Status"
+                    ItemsSource="{Binding StatusFilters}"
+                    SelectedItem="{Binding SelectedStatusFilter}" />
+
             <CollectionView HeightRequest="300"
                             ItemsSource="{Binding IncomingRentals}">
                 <CollectionView.EmptyView>
