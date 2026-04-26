@@ -28,6 +28,11 @@ public class RentalRepository : IRentalRepository
         {
             var errorBody = await response.Content.ReadAsStringAsync();
 
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+               throw new Exception("This item is already booked for the selected dates.");
+            }
+
             if (errorBody.Contains("date", StringComparison.OrdinalIgnoreCase))
             {
                 throw new Exception("Please choose valid rental dates.");
