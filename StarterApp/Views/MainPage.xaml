@@ -20,7 +20,7 @@
         <ScrollView>
             <VerticalStackLayout Padding="20" Spacing="20">
 
-                <!-- Welcome Section -->
+                <!--- Welcome Section -->
                 <Border BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
                         Padding="20"
                         HeightRequest="120">

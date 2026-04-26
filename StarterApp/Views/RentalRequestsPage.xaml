@@ -4,8 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              Title="{Binding Title}">
 
-    <RefreshView IsRefreshing="{Binding IsBusy}"
-                 Command="{Binding LoadRentalsCommand}">
+    <RefreshView Command="{Binding LoadRentalsCommand}">
         <ScrollView>
             <VerticalStackLayout Padding="20" Spacing="20">
 

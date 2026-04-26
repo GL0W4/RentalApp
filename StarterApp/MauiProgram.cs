@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using StarterApp.ViewModels;
 using StarterApp.Database.Data;
 using StarterApp.Views;
+using StarterApp.Repositories;
 using System.Diagnostics;
 using StarterApp.Services;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddSingleton<IItemService, ItemService>();
         builder.Services.AddSingleton<IRentalService, RentalService>();
+        builder.Services.AddSingleton<IItemRepository, ItemRepository>();
+        builder.Services.AddSingleton<IRentalRepository, RentalRepository>();
 
         builder.Services.AddSingleton<AppShellViewModel>();
         builder.Services.AddSingleton<AppShell>();
