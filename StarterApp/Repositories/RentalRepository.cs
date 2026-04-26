@@ -100,4 +100,40 @@ public class RentalRepository : IRentalRepository
         var result = await response.Content.ReadFromJsonAsync<RentalListResponse>();
         return result?.Rentals ?? new List<RentalRequestItem>();
     }
+
+    public async Task UpdateRentalStatusAsync(int rentalId, string status, string jwtToken)
+    {
+        var request = new UpdateRentalStatusRequest
+        {
+            Status = status
+        };
+
+        using var message = new HttpRequestMessage(HttpMethod.Patch, $"/rentals/{rentalId}/status");
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+        message.Content = JsonContent.Create(request);
+
+        var response = await _httpClient.SendAsync(message);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                throw new Exception("You can only update rental requests you are involved in.");
+            }
+
+            if (errorBody.Contains("Invalid state transition", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("This rental request cannot be updated to the selected status.");
+            }
+
+            if (errorBody.Contains("owner", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Only the owner of this item can approve or reject rental requests.");
+            }
+
+            throw new Exception($"Failed to update rental status: {(int)response.StatusCode} {response.ReasonPhrase}. API said: {errorBody}");
+        }
+    }
 }

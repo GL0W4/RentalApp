@@ -31,6 +31,23 @@ public class RentalService : IRentalService
         return await _rentalRepository.GetOutgoingRentalsAsync(jwtToken, status);
     }
 
+    public async Task UpdateRentalStatusAsync(int rentalId, string status)
+    {
+        var jwtToken = await GetRequiredTokenAsync();
+
+        if (rentalId <= 0)
+        {
+            throw new ArgumentException("Rental request not identified.");
+        }
+
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            throw new Exception("Rental status must be provided.");
+        }
+
+        await _rentalRepository.UpdateRentalStatusAsync(rentalId, status, jwtToken);
+    }
+
     private async Task<string> GetRequiredTokenAsync()
     {
         var jwtToken = await _authService.GetValidTokenAsync();

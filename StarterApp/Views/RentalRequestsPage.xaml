@@ -16,8 +16,8 @@
                        FontSize="22"
                        FontAttributes="Bold" />
 
-                <CollectionView ItemsSource="{Binding IncomingRentals}"
-                                HeightRequest="300">
+                <CollectionView HeightRequest="300"
+                                ItemsSource="{Binding IncomingRentals}">
                     <CollectionView.EmptyView>
                         <Label Text="No incoming rental requests." />
                     </CollectionView.EmptyView>
@@ -36,11 +36,24 @@
                                            FontSize="18"
                                            FontAttributes="Bold" />
                                     <Label Text="{Binding BorrowerName, StringFormat='Borrower: {0}'}" />
-                                    <Label Text="{Binding StartDate, StringFormat='Start: {0}'}" />
-                                    <Label Text="{Binding EndDate, StringFormat='End: {0}'}" />
+                                    <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
+                                    <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
                                     <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
-                                    <Label Text="{Binding TotalPrice, StringFormat='Total: £{0:F2}'}"
+                                    <Label Text="{Binding TotalPrice, StringFormat='Total: &#163;{0:F2}'}"
                                            FontAttributes="Bold" />
+
+                                    <HorizontalStackLayout Spacing="10"
+                                                           IsVisible="{Binding CanOwnerRespond}">
+                                        <Button Text="Approve"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveRentalCommand}"
+                                                CommandParameter="{Binding .}"
+                                                HorizontalOptions="FillAndExpand" />
+
+                                        <Button Text="Reject"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectRentalCommand}"
+                                                CommandParameter="{Binding .}"
+                                                HorizontalOptions="FillAndExpand" />
+                                    </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
@@ -51,8 +64,8 @@
                        FontSize="22"
                        FontAttributes="Bold" />
 
-                <CollectionView ItemsSource="{Binding OutgoingRentals}"
-                                HeightRequest="300">
+                <CollectionView HeightRequest="300"
+                                ItemsSource="{Binding OutgoingRentals}">
                     <CollectionView.EmptyView>
                         <Label Text="No outgoing rental requests." />
                     </CollectionView.EmptyView>
@@ -70,11 +83,12 @@
                                     <Label Text="{Binding ItemTitle}"
                                            FontSize="18"
                                            FontAttributes="Bold" />
+                                    <Label Text="{Binding Id, StringFormat='Rental ID: {0}'}" />
                                     <Label Text="{Binding OwnerName, StringFormat='Owner: {0}'}" />
-                                    <Label Text="{Binding StartDate, StringFormat='Start: {0}'}" />
-                                    <Label Text="{Binding EndDate, StringFormat='End: {0}'}" />
+                                    <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
+                                    <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
                                     <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
-                                    <Label Text="{Binding TotalPrice, StringFormat='Total: £{0:F2}'}"
+                                    <Label Text="{Binding TotalPrice, StringFormat='Total: &#163;{0:F2}'}"
                                            FontAttributes="Bold" />
                                 </VerticalStackLayout>
                             </Border>

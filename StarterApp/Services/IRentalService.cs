@@ -5,5 +5,6 @@ public interface IRentalService
     Task SubmitRentalRequestAsync(CreateRentalRequest request);
     Task<List<RentalRequestItem>> GetIncomingRentalsAsync(string? status = null);
     Task<List<RentalRequestItem>> GetOutgoingRentalsAsync(string? status = null);
+    Task UpdateRentalStatusAsync(int rentalId, string status);
 
 }
