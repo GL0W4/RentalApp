@@ -4,97 +4,111 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              Title="{Binding Title}">
 
-        <ScrollView>
-            <VerticalStackLayout Padding="20" Spacing="20">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
 
-                <Label Text="{Binding ErrorMessage}"
-                       TextColor="Red"
-                       IsVisible="{Binding HasError}" />
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   IsVisible="{Binding HasError}" />
 
-                <Label Text="Incoming Requests"
-                       FontSize="22"
-                       FontAttributes="Bold" />
+            <Label Text="Incoming Requests"
+                   FontSize="22"
+                   FontAttributes="Bold" />
 
-                <CollectionView HeightRequest="300"
-                                ItemsSource="{Binding IncomingRentals}">
-                    <CollectionView.EmptyView>
-                        <Label Text="No incoming rental requests." />
-                    </CollectionView.EmptyView>
+            <CollectionView HeightRequest="300"
+                            ItemsSource="{Binding IncomingRentals}">
+                <CollectionView.EmptyView>
+                    <Label Text="No incoming rental requests." />
+                </CollectionView.EmptyView>
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border StrokeThickness="1"
-                                    Padding="12"
-                                    Margin="0,0,0,10">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8" />
-                                </Border.StrokeShape>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeThickness="1"
+                                Padding="12"
+                                Margin="0,0,0,10">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
 
-                                <VerticalStackLayout Spacing="5">
-                                    <Label Text="{Binding ItemTitle}"
-                                           FontSize="18"
-                                           FontAttributes="Bold" />
-                                    <Label Text="{Binding BorrowerName, StringFormat='Borrower: {0}'}" />
-                                    <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
-                                    <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
-                                    <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
-                                    <Label Text="{Binding TotalPrice, StringFormat='Total: &#163;{0:F2}'}"
-                                           FontAttributes="Bold" />
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="{Binding ItemTitle}"
+                                       FontSize="18"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding BorrowerName, StringFormat='Borrower: {0}'}" />
+                                <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
+                                <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
+                                <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
+                                <Label Text="{Binding TotalPrice, StringFormat='Total: &#163;{0:F2}'}"
+                                       FontAttributes="Bold" />
 
-                                    <HorizontalStackLayout Spacing="10"
-                                                           IsVisible="{Binding CanOwnerRespond}">
-                                        <Button Text="Approve"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveRentalCommand}"
-                                                CommandParameter="{Binding .}"
-                                                HorizontalOptions="FillAndExpand" />
+                                <HorizontalStackLayout Spacing="10"
+                                                       IsVisible="{Binding CanOwnerRespond}">
+                                    <Button Text="Approve"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveRentalCommand}"
+                                            CommandParameter="{Binding .}"
+                                            HorizontalOptions="FillAndExpand" />
 
-                                        <Button Text="Reject"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectRentalCommand}"
-                                                CommandParameter="{Binding .}"
-                                                HorizontalOptions="FillAndExpand" />
-                                    </HorizontalStackLayout>
-                                </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                                    <Button Text="Reject"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectRentalCommand}"
+                                            CommandParameter="{Binding .}"
+                                            HorizontalOptions="FillAndExpand" />
 
-                <Label Text="Outgoing Requests"
-                       FontSize="22"
-                       FontAttributes="Bold" />
+                                    <Button Text="Mark Out for Rent"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarkOutForRentCommand}"
+                                            CommandParameter="{Binding .}"
+                                            IsVisible="{Binding CanMarkOutForRent}" />
 
-                <CollectionView HeightRequest="300"
-                                ItemsSource="{Binding OutgoingRentals}">
-                    <CollectionView.EmptyView>
-                        <Label Text="No outgoing rental requests." />
-                    </CollectionView.EmptyView>
+                                    <Button Text="Complete Rental"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CompleteRentalCommand}"
+                                            CommandParameter="{Binding .}"
+                                            IsVisible="{Binding CanComplete}" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border StrokeThickness="1"
-                                    Padding="12"
-                                    Margin="0,0,0,10">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8" />
-                                </Border.StrokeShape>
+            <Label Text="Outgoing Requests"
+                   FontSize="22"
+                   FontAttributes="Bold" />
 
-                                <VerticalStackLayout Spacing="5">
-                                    <Label Text="{Binding ItemTitle}"
-                                           FontSize="18"
-                                           FontAttributes="Bold" />
-                                    <Label Text="{Binding Id, StringFormat='Rental ID: {0}'}" />
-                                    <Label Text="{Binding OwnerName, StringFormat='Owner: {0}'}" />
-                                    <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
-                                    <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
-                                    <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
-                                    <Label Text="{Binding TotalPrice, StringFormat='Total: &#163;{0:F2}'}"
-                                           FontAttributes="Bold" />
-                                </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+            <CollectionView HeightRequest="300"
+                            ItemsSource="{Binding OutgoingRentals}">
+                <CollectionView.EmptyView>
+                    <Label Text="No outgoing rental requests." />
+                </CollectionView.EmptyView>
 
-            </VerticalStackLayout>
-        </ScrollView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeThickness="1"
+                                Padding="12"
+                                Margin="0,0,0,10">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="{Binding ItemTitle}"
+                                       FontSize="18"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding Id, StringFormat='Rental ID: {0}'}" />
+                                <Label Text="{Binding OwnerName, StringFormat='Owner: {0}'}" />
+                                <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
+                                <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
+                                <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
+                                <Label Text="{Binding TotalPrice, StringFormat='Total: &#163;{0:F2}'}"
+                                       FontAttributes="Bold" />
+
+                                <Button Text="Mark Returned"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarkReturnedCommand}"
+                                        CommandParameter="{Binding .}"
+                                        IsVisible="{Binding CanMarkReturned}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

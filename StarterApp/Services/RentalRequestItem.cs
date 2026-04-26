@@ -34,4 +34,17 @@ public class RentalRequestItem
     DateTime.TryParse(EndDate, out var date)
         ? date.ToString("dd/MM/yyyy")
         : EndDate;
+
+    public bool CanApproveOrReject =>
+    string.Equals(Status, "Requested", StringComparison.OrdinalIgnoreCase);
+
+    public bool CanMarkOutForRent =>
+        string.Equals(Status, "Approved", StringComparison.OrdinalIgnoreCase);
+
+    public bool CanMarkReturned =>
+        string.Equals(Status, "Out for Rent", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(Status, "Overdue", StringComparison.OrdinalIgnoreCase);
+
+    public bool CanComplete =>
+        string.Equals(Status, "Returned", StringComparison.OrdinalIgnoreCase);
 }
