@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using StarterApp.Database.Models;
 using StarterApp.Services;
 
@@ -57,4 +58,24 @@ public partial class ItemDetailViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    [RelayCommand]
+    private async Task NavigateToEditItemAsync()
+    {
+        if (Item == null)
+            return;
+
+        await Shell.Current.GoToAsync($"EditItemPage?itemId={Item.Id}");
+    }
+
+    [RelayCommand]
+    private async Task NavigateToRentalRequestAsync()
+    {
+        if (Item == null)
+            return;
+
+        await Shell.Current.GoToAsync($"CreateRentalRequestPage?itemId={Item.Id}");
+    }
+
+    
 }

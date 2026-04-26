@@ -9,14 +9,18 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 
-            <ActivityIndicator IsRunning="{Binding IsLoading}"
-                               IsVisible="{Binding IsLoading}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}" />
 
             <Label Text="{Binding ErrorMessage}"
                    TextColor="Red"
-                   IsVisible="{Binding ErrorMessage}" />
+                   IsVisible="{Binding HasError}" />
 
             <Label Text="{Binding Item.Title}"
+                   FontSize="26"
+                   FontAttributes="Bold" />
+
+            <Label Text="{Binding Item.Id, StringFormat='ID: {0}'}"
                    FontSize="26"
                    FontAttributes="Bold" />
 
@@ -35,6 +39,16 @@
 
             <Label Text="{Binding Item.IsAvailable, StringFormat='Available: {0}'}"
                    FontSize="14" />
+
+              <Button Text="Edit Item"
+                     Command="{Binding NavigateToEditItemCommand}"
+                     BackgroundColor="Green"
+                     TextColor="White" />
+              
+              <Button Text="Request Rental"
+                     Command="{Binding NavigateToRentalRequestCommand}"
+                     BackgroundColor="Green"
+                     TextColor="White" />
 
         </VerticalStackLayout>
     </ScrollView>

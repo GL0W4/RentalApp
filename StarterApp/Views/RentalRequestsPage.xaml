@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="StarterApp.Views.RentalRequestsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}">
+
+    <RefreshView IsRefreshing="{Binding IsBusy}"
+                 Command="{Binding LoadRentalsCommand}">
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="Red"
+                       IsVisible="{Binding HasError}" />
+
+                <Label Text="Incoming Requests"
+                       FontSize="22"
+                       FontAttributes="Bold" />
+
+                <CollectionView ItemsSource="{Binding IncomingRentals}"
+                                HeightRequest="300">
+                    <CollectionView.EmptyView>
+                        <Label Text="No incoming rental requests." />
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border StrokeThickness="1"
+                                    Padding="12"
+                                    Margin="0,0,0,10">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8" />
+                                </Border.StrokeShape>
+
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="{Binding ItemTitle}"
+                                           FontSize="18"
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding BorrowerName, StringFormat='Borrower: {0}'}" />
+                                    <Label Text="{Binding StartDate, StringFormat='Start: {0}'}" />
+                                    <Label Text="{Binding EndDate, StringFormat='End: {0}'}" />
+                                    <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
+                                    <Label Text="{Binding TotalPrice, StringFormat='Total: £{0:F2}'}"
+                                           FontAttributes="Bold" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label Text="Outgoing Requests"
+                       FontSize="22"
+                       FontAttributes="Bold" />
+
+                <CollectionView ItemsSource="{Binding OutgoingRentals}"
+                                HeightRequest="300">
+                    <CollectionView.EmptyView>
+                        <Label Text="No outgoing rental requests." />
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border StrokeThickness="1"
+                                    Padding="12"
+                                    Margin="0,0,0,10">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8" />
+                                </Border.StrokeShape>
+
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="{Binding ItemTitle}"
+                                           FontSize="18"
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding OwnerName, StringFormat='Owner: {0}'}" />
+                                    <Label Text="{Binding StartDate, StringFormat='Start: {0}'}" />
+                                    <Label Text="{Binding EndDate, StringFormat='End: {0}'}" />
+                                    <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
+                                    <Label Text="{Binding TotalPrice, StringFormat='Total: £{0:F2}'}"
+                                           FontAttributes="Bold" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

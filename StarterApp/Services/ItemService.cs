@@ -74,6 +74,59 @@ public class ItemService : IItemService
         return createdItem;
     }
 
+    public async Task<Item> UpdateItemAsync(int itemId, UpdateItemRequest request)
+    {
+        var jwtToken = await _authService.GetValidTokenAsync();
+
+        if (string.IsNullOrWhiteSpace(jwtToken))
+        {
+            throw new Exception("You must be logged in to update an item.");
+        }
+
+        using var message = new HttpRequestMessage(HttpMethod.Put, $"/items/{itemId}");
+        message.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwtToken);
+        message.Content = JsonContent.Create(request);
+
+        var response = await _httpClient.SendAsync(message);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                throw new Exception("You can only update items that you own.");
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new Exception("Item not found.");
+            }
+
+            if (errorBody.Contains("title", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Title must be at least 5 characters long.");
+            }
+
+            if (errorBody.Contains("dailyRate", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Daily rate must be valid.");
+            }
+
+            throw new Exception("Failed to update item.");
+        }
+
+        var updatedItem = await response.Content.ReadFromJsonAsync<Item>();
+
+        if (updatedItem == null)
+        {
+            throw new Exception("Update item failed: empty response.");
+        }
+
+        return updatedItem;
+    }
+
+
     private class ItemListResponse
     {
         public List<Item> Items { get; set; } = new();
