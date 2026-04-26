@@ -1,3 +1,5 @@
+using StarterApp.Core.Rentals;
+
 namespace StarterApp.Services;
 
 public class RentalRequestItem
@@ -35,16 +37,11 @@ public class RentalRequestItem
         ? date.ToString("dd/MM/yyyy")
         : EndDate;
 
-    public bool CanApproveOrReject =>
-    string.Equals(Status, "Requested", StringComparison.OrdinalIgnoreCase);
+    public bool CanApproveOrReject => RentalStatusRules.CanApproveOrReject(Status);
 
-    public bool CanMarkOutForRent =>
-        string.Equals(Status, "Approved", StringComparison.OrdinalIgnoreCase);
+    public bool CanMarkOutForRent => RentalStatusRules.CanMarkOutForRent(Status);
 
-    public bool CanMarkReturned =>
-        string.Equals(Status, "Out for Rent", StringComparison.OrdinalIgnoreCase) ||
-        string.Equals(Status, "Overdue", StringComparison.OrdinalIgnoreCase);
+    public bool CanMarkReturned => RentalStatusRules.CanMarkReturned(Status);
 
-    public bool CanComplete =>
-        string.Equals(Status, "Returned", StringComparison.OrdinalIgnoreCase);
+    public bool CanComplete => RentalStatusRules.CanComplete(Status);
 }

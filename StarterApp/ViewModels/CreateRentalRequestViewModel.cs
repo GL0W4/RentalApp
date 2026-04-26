@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarterApp.Services;
 using System.Globalization;
+using StarterApp.Core.Rentals;
 
 namespace StarterApp.ViewModels;
 
@@ -31,9 +32,12 @@ public partial class CreateRentalRequestViewModel : BaseViewModel
         : 0;
 
     // AI-assisted: estimate values are calculated client-side from DateTime picker values.
-    public int RentalDays => Math.Max(0, (EndDate.Date - StartDate.Date).Days);
+    // Reviewed and modified to adapt to unit tests
+    public int RentalDays =>
+    RentalPriceCalculator.CalculateRentalDays(StartDate, EndDate);
 
-    public decimal EstimatedTotal => DailyRate * RentalDays;
+    public decimal EstimatedTotal =>
+    RentalPriceCalculator.CalculateEstimatedTotal(DailyRate, StartDate, EndDate);
 
     public CreateRentalRequestViewModel(IRentalService rentalService)
     {
