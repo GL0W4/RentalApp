@@ -42,13 +42,11 @@
 
               <Button Text="Edit Item"
                      Command="{Binding NavigateToEditItemCommand}"
-                     BackgroundColor="Green"
-                     TextColor="White" />
+                     TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
               
               <Button Text="Request Rental"
                      Command="{Binding NavigateToRentalRequestCommand}"
-                     BackgroundColor="Green"
-                     TextColor="White" />
+                     TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
 
         </VerticalStackLayout>
     </ScrollView>
