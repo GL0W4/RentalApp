@@ -1,10 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarterApp.Services;
+using System.Globalization;
 
 namespace StarterApp.ViewModels;
 
 [QueryProperty(nameof(ItemId), "itemId")]
+[QueryProperty(nameof(DailyRateText), "dailyRate")]
 public partial class CreateRentalRequestViewModel : BaseViewModel
 {
     private readonly IRentalService _rentalService;
@@ -12,16 +14,50 @@ public partial class CreateRentalRequestViewModel : BaseViewModel
     [ObservableProperty]
     private int itemId;
 
+    // AI-assisted: daily rate is supplied by Shell query and used only for the local estimate.
+    // Reviewed and modified to string to allow passing the raw value from the query without parsing issues, and then parsed client-side for calculations.
+    [ObservableProperty]
+    private string dailyRateText = string.Empty;
+
     [ObservableProperty]
     private DateTime startDate = DateTime.Today;
 
     [ObservableProperty]
     private DateTime endDate = DateTime.Today.AddDays(1);
 
+    public decimal DailyRate =>
+    decimal.TryParse(DailyRateText, NumberStyles.Number, CultureInfo.InvariantCulture, out var rate)
+        ? rate
+        : 0;
+
+    // AI-assisted: estimate values are calculated client-side from DateTime picker values.
+    public int RentalDays => Math.Max(0, (EndDate.Date - StartDate.Date).Days);
+
+    public decimal EstimatedTotal => DailyRate * RentalDays;
+
     public CreateRentalRequestViewModel(IRentalService rentalService)
     {
         _rentalService = rentalService;
         Title = "Request Rental";
+    }
+
+    // AI-assisted: keep estimate bindings refreshed when the incoming rate or dates change.
+    partial void OnDailyRateTextChanged(string value)
+    {
+        OnPropertyChanged(nameof(DailyRate));
+        OnPropertyChanged(nameof(EstimatedTotal));
+    }
+
+    partial void OnStartDateChanged(DateTime value)
+    {
+        OnPropertyChanged(nameof(RentalDays));
+        OnPropertyChanged(nameof(EstimatedTotal));
+    }
+
+    partial void OnEndDateChanged(DateTime value)
+    {
+        OnPropertyChanged(nameof(RentalDays));
+        OnPropertyChanged(nameof(EstimatedTotal));
     }
 
     [RelayCommand]

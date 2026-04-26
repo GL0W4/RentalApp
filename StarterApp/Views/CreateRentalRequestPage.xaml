@@ -17,6 +17,10 @@
             <Label Text="{Binding ItemId, StringFormat='Item ID: {0}'}"
                    FontSize="14" />
 
+            <!-- AI-assisted: display the query-supplied rate used for the client-side estimate. -->
+            <Label Text="{Binding DailyRate, StringFormat='Daily rate: £{0:F2}'}"
+                   FontSize="14" />
+
             <Label Text="Start Date"
                    FontAttributes="Bold" />
 
@@ -26,6 +30,14 @@
                    FontAttributes="Bold" />
 
             <DatePicker Date="{Binding EndDate}" />
+
+            <!-- AI-assisted: show the calculated rental duration and estimated total without changing submission. -->
+            <Label Text="{Binding RentalDays, StringFormat='Rental days: {0}'}"
+                   FontSize="14" />
+
+            <Label Text="{Binding EstimatedTotal, StringFormat='Estimated total: £{0:F2}'}"
+                   FontSize="18"
+                   FontAttributes="Bold" />
 
             <Button Text="Submit Rental Request"
                     Command="{Binding SubmitRequestCommand}" />

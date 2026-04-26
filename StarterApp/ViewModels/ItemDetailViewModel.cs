@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Globalization;
 using StarterApp.Database.Models;
 using StarterApp.Services;
 
@@ -74,7 +75,10 @@ public partial class ItemDetailViewModel : BaseViewModel
         if (Item == null)
             return;
 
-        await Shell.Current.GoToAsync($"CreateRentalRequestPage?itemId={Item.Id}");
+        // AI-assisted: pass the current item's daily rate to the rental request page for client-side estimates.
+        var dailyRate = Item.DailyRate.ToString(CultureInfo.InvariantCulture);
+        await Shell.Current.GoToAsync(
+            $"CreateRentalRequestPage?itemId={Item.Id}&dailyRate={dailyRate}");
     }
 
     
