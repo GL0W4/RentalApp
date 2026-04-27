@@ -125,4 +125,43 @@ public class ItemRepository : IItemRepository
     {
         public List<ItemCategory> Categories { get; set; } = new();
     }
+
+    public async Task<List<Item>> GetNearbyAsync(double latitude, double longitude, double radiusKm, string? category = null)
+    {
+        var url = $"/items/nearby?lat={latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}" +
+                  $"&lon={longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}" +
+                  $"&radius={radiusKm.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            url += $"&category={Uri.EscapeDataString(category)}";
+        }
+
+        var response = await _httpClient.GetAsync(url);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+
+            if (errorBody.Contains("coordinates", StringComparison.OrdinalIgnoreCase) ||
+                errorBody.Contains("latitude", StringComparison.OrdinalIgnoreCase) ||
+                errorBody.Contains("longitude", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception("Invalid location coordinates.");
+            }
+
+            throw new Exception($"Failed to load nearby items. API said: {errorBody}");
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<NearbyItemListResponse>();
+        return result?.Items ?? new List<Item>();
+    }
+
+    private class NearbyItemListResponse
+    {
+        public List<Item> Items { get; set; } = new();
+        public LocationResult? SearchLocation { get; set; }
+        public double Radius { get; set; }
+        public int TotalResults { get; set; }
+    }
 }

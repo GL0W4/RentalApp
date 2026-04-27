@@ -8,4 +8,5 @@ public interface IItemRepository : IRepository<Item>
     Task<Item> CreateAsync(CreateItemRequest request, string jwtToken);
     Task<Item> UpdateAsync(int itemId, UpdateItemRequest request, string jwtToken);
     Task<List<ItemCategory>> GetCategoriesAsync();
+    Task<List<Item>> GetNearbyAsync(double latitude, double longitude, double radiusKm, string? category = null);
 }

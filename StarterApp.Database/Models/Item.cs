@@ -10,4 +10,7 @@ public class Item
     public string OwnerName { get; set; } = string.Empty;
     public bool IsAvailable { get; set; }
     public string? ImageUrl { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public double? Distance { get; set; }
 }

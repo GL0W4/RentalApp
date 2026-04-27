@@ -1,5 +1,6 @@
 using StarterApp.Database.Models;
 using StarterApp.Repositories;
+using StarterApp.Core.Items;
 
 namespace StarterApp.Services;
 
@@ -46,5 +47,25 @@ public class ItemService : IItemService
         }
 
         return await _itemRepository.UpdateAsync(itemId, request, jwtToken);
+    }
+
+    public async Task<List<Item>> GetNearbyItemsAsync(double latitude, double longitude, double radiusKm, string? category = null)
+    {
+        if (!ItemValidationRules.IsValidLatitude(latitude))
+        {
+            throw new Exception("Latitude must be between -90 and 90.");
+        }
+
+        if (!ItemValidationRules.IsValidLongitude(longitude))
+        {
+            throw new Exception("Longitude must be between -180 and 180.");
+        }
+
+        if (!ItemValidationRules.IsValidSearchRadius(radiusKm))
+        {
+            throw new Exception("Radius must be between 1 and 50 km.");
+        }
+
+        return await _itemRepository.GetNearbyAsync(latitude, longitude, radiusKm, category);
     }
 }

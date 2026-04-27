@@ -30,6 +30,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IRentalService, RentalService>();
         builder.Services.AddSingleton<IItemRepository, ItemRepository>();
         builder.Services.AddSingleton<IRentalRepository, RentalRepository>();
+        builder.Services.AddSingleton<ILocationService, LocationService>();
 
         builder.Services.AddSingleton<AppShellViewModel>();
         builder.Services.AddSingleton<AppShell>();
@@ -60,6 +61,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CreateRentalRequestPage>();
         builder.Services.AddTransient<RentalRequestsViewModel>();
         builder.Services.AddTransient<RentalRequestsPage>();
+
 
         #if DEBUG
         builder.Logging.AddDebug();

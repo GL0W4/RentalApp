@@ -3,6 +3,7 @@ namespace StarterApp.Core.Items;
 public static class ItemValidationRules
 {
     public const int MinimumTitleLength = 5;
+    public const double MaximumSearchRadiusKm = 50;
 
     public static bool HasTitle(string? title)
     {
@@ -27,5 +28,10 @@ public static class ItemValidationRules
     public static bool IsValidLongitude(double longitude)
     {
         return longitude >= -180 && longitude <= 180;
+    }
+
+    public static bool IsValidSearchRadius(double radiusKm)
+    {
+        return radiusKm > 0 && radiusKm <= MaximumSearchRadiusKm;
     }
 }
