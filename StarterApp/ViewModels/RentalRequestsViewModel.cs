@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarterApp.Services;
 using System.Collections.ObjectModel;
+using StarterApp.Core.Rentals;
 
 namespace StarterApp.ViewModels;
 
@@ -86,7 +87,7 @@ public partial class RentalRequestsViewModel : BaseViewModel
         if (rental == null)
             return;
 
-        await UpdateRentalStatusAsync(rental, "Approved");
+        await UpdateRentalStatusAsync(rental, RentalStatuses.Approved);
     }
 
     [RelayCommand]
@@ -95,7 +96,7 @@ public partial class RentalRequestsViewModel : BaseViewModel
         if (rental == null)
             return;
 
-        await UpdateRentalStatusAsync(rental, "Rejected");
+        await UpdateRentalStatusAsync(rental, RentalStatuses.Rejected);
     }
 
     private async Task UpdateRentalStatusAsync(RentalRequestItem rental, string status)
@@ -144,7 +145,7 @@ public partial class RentalRequestsViewModel : BaseViewModel
         if (rental == null)
             return;
 
-        await UpdateRentalStatusAsync(rental, "Out for Rent");
+        await UpdateRentalStatusAsync(rental, RentalStatuses.OutForRent);
     }
 
     [RelayCommand]
@@ -153,7 +154,7 @@ public partial class RentalRequestsViewModel : BaseViewModel
         if (rental == null)
             return;
 
-        await UpdateRentalStatusAsync(rental, "Returned");
+        await UpdateRentalStatusAsync(rental, RentalStatuses.Returned);
     }
 
     [RelayCommand]
@@ -162,7 +163,7 @@ public partial class RentalRequestsViewModel : BaseViewModel
         if (rental == null)
             return;
 
-        await UpdateRentalStatusAsync(rental, "Completed");
+        await UpdateRentalStatusAsync(rental, RentalStatuses.Completed);
     }
 
     partial void OnSelectedStatusFilterChanged(string value)
