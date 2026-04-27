@@ -50,7 +50,7 @@
                                        FontAttributes="Bold" />
 
                                 <HorizontalStackLayout Spacing="10"
-                                                       IsVisible="{Binding CanOwnerRespond}">
+                                                       IsVisible="{Binding CanApproveOrReject}">
                                     <Button Text="Approve"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveRentalCommand}"
                                             CommandParameter="{Binding .}"
@@ -60,7 +60,7 @@
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectRentalCommand}"
                                             CommandParameter="{Binding .}"
                                             HorizontalOptions="FillAndExpand" />
-
+                                </HorizontalStackLayout>
                                     <Button Text="Mark Out for Rent"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarkOutForRentCommand}"
                                             CommandParameter="{Binding .}"
@@ -70,7 +70,6 @@
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CompleteRentalCommand}"
                                             CommandParameter="{Binding .}"
                                             IsVisible="{Binding CanComplete}" />
-                                </HorizontalStackLayout>
                             </VerticalStackLayout>
                         </Border>
                     </DataTemplate>
