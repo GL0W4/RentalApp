@@ -20,13 +20,13 @@ public partial class RentalRequestsViewModel : BaseViewModel
     private ObservableCollection<string> statusFilters = new()
     {
         "All",
-        "Requested",
-        "Approved",
-        "Rejected",
-        "Out for Rent",
-        "Overdue",
-        "Returned",
-        "Completed"
+        RentalStatuses.Requested,
+        RentalStatuses.Approved,
+        RentalStatuses.Rejected,
+        RentalStatuses.OutForRent,
+        RentalStatuses.Overdue,
+        RentalStatuses.Returned,
+        RentalStatuses.Completed
     };
 
     [ObservableProperty]

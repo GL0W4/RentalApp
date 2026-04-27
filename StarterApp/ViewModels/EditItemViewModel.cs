@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarterApp.Database.Models;
+using StarterApp.Core.Items;
 using StarterApp.Services;
 using System.Globalization;
 
@@ -121,15 +122,15 @@ public partial class EditItemViewModel : BaseViewModel
     {
         dailyRate = 0;
 
-        if (string.IsNullOrWhiteSpace(TitleText))
+        if (!ItemValidationRules.HasTitle(TitleText))
         {
             SetError("Title is required.");
             return false;
         }
 
-        if (TitleText.Trim().Length < 5)
+        if (!ItemValidationRules.HasValidTitleLength(TitleText))
         {
-            SetError("Title must be at least 5 characters long.");
+            SetError("Title must be at least {ItemValidationRules.MinimumTitleLength} characters long.");
             return false;
         }
 
@@ -140,7 +141,7 @@ public partial class EditItemViewModel : BaseViewModel
             return false;
         }
 
-        if (dailyRate <= 0)
+        if (!ItemValidationRules.IsValidDailyRate(dailyRate))
         {
             SetError("Daily rate must be greater than zero.");
             return false;

@@ -24,9 +24,6 @@ public class RentalRequestItem
     public DateTime? RequestedAt { get; set; }
     public DateTime? ApprovedAt { get; set; }
 
-    public bool CanOwnerRespond =>
-    string.Equals(Status, "Requested", StringComparison.OrdinalIgnoreCase);
-
     public string StartDateDisplay =>
     DateTime.TryParse(StartDate, out var date)
         ? date.ToString("dd/MM/yyyy")

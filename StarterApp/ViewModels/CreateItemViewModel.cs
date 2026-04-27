@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using StarterApp.Core.Items;
 using StarterApp.Services;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -117,15 +118,15 @@ public partial class CreateItemViewModel : BaseViewModel
         latitude = 0;
         longitude = 0;
 
-        if (string.IsNullOrWhiteSpace(TitleText))
+        if (!ItemValidationRules.HasTitle(TitleText))
         {
             SetError("Title is required.");
             return false;
         }
 
-        if (TitleText.Trim().Length < 5)
+        if (!ItemValidationRules.HasValidTitleLength(TitleText))
         {
-            SetError("Title must be at least 5 characters long.");
+            SetError("Title must be at least {ItemValidationRules.MinimumTitleLength} characters long.");
             return false;
         }
 
@@ -142,7 +143,7 @@ public partial class CreateItemViewModel : BaseViewModel
             return false;
         }
 
-        if (dailyRate <= 0)
+        if (!ItemValidationRules.IsValidDailyRate(dailyRate))
         {
             SetError("Daily rate must be greater than zero.");
             return false;
@@ -155,7 +156,7 @@ public partial class CreateItemViewModel : BaseViewModel
             return false;
         }
 
-        if (latitude < -90 || latitude > 90)
+        if (!ItemValidationRules.IsValidLatitude(latitude))
         {
             SetError("Latitude must be between -90 and 90.");
             return false;
@@ -168,7 +169,7 @@ public partial class CreateItemViewModel : BaseViewModel
             return false;
         }
 
-        if (longitude < -180 || longitude > 180)
+        if (!ItemValidationRules.IsValidLongitude(longitude))
         {
             SetError("Longitude must be between -180 and 180.");
             return false;
