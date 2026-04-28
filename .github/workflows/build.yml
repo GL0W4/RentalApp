@@ -41,5 +41,11 @@ jobs:
       - name: Build StarterApp Android
         run: dotnet build StarterApp/StarterApp.csproj -c Release -f net10.0-android --no-restore
 
-      - name: Test
-        run: dotnet test StarterApp.Tests/StarterApp.Tests.csproj -c Release --no-restore
+      - name: Test with coverage
+        run: dotnet test StarterApp.Tests/StarterApp.Tests.csproj -c Release --no-restore --collect:"XPlat Code Coverage"
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage
+          path: StarterApp.Tests/TestResults/**/*.xml
