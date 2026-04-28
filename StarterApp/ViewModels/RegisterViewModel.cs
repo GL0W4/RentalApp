@@ -52,14 +52,6 @@ public partial class RegisterViewModel : BaseViewModel
     [ObservableProperty]
     private bool acceptTerms;
 
-    /// @brief Default constructor for design-time support
-    /// @details Sets the title to "Register"
-    public RegisterViewModel()
-    {
-        // Default constructor for design time support
-        Title = "Register";
-    }
-
     /// @brief Initializes a new instance of the RegisterViewModel class
     /// @param authService The authentication service instance
     /// @param navigationService The navigation service instance

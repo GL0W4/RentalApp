@@ -24,15 +24,6 @@ public partial class MainViewModel : BaseViewModel
     /// @details Observable property showing a personalized welcome message
     [ObservableProperty]
     private string welcomeMessage = string.Empty;
-
-    /// @brief Default constructor for design-time support
-    /// @details Sets the title to "Dashboard"
-    public MainViewModel()
-    {
-        // Default constructor for design time support
-        Title = "Dashboard";
-        WelcomeMessage = "Welcome!";
-    }
     
     /// @brief Initializes a new instance of the MainViewModel class
     /// @param authService The authentication service instance
@@ -43,6 +34,7 @@ public partial class MainViewModel : BaseViewModel
         _authService = authService;
         _navigationService = navigationService;
         Title = "Dashboard";
+        WelcomeMessage = "Welcome!";
 
         LoadUserData();
     }

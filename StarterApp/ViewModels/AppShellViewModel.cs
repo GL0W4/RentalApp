@@ -26,13 +26,6 @@ namespace StarterApp.ViewModels
         /// @details Observable collection that can be modified at runtime based on authentication state
         public ObservableCollection<MenuBarItem> DynamicMenuBarItems { get; } = new();
 
-        /// @brief Default constructor for design-time support
-        /// @details Sets the title to "StarterApp"
-        public AppShellViewModel()
-        {
-            Title = "StarterApp";
-        }
-
         /// @brief Initializes a new instance of the AppShellViewModel class
         /// @param authService The authentication service instance
         /// @param navigationService The navigation service instance

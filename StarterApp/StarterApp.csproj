@@ -9,7 +9,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-
+		<NoWarn>$(NoWarn);CS1587</NoWarn>
 		<!-- Display name -->
 		<ApplicationTitle>StarterApp</ApplicationTitle>
 

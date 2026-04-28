@@ -12,6 +12,10 @@ public static class ItemValidationRules
 
     public static bool HasValidTitleLength(string? title)
     {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            return false;
+        }
         return HasTitle(title) && title.Trim().Length >= MinimumTitleLength;
     }
 

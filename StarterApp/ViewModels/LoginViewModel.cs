@@ -38,12 +38,6 @@ public partial class LoginViewModel : BaseViewModel
     [ObservableProperty]
     private bool isPasswordVisible;
 
-    /// @brief Default constructor for design-time support
-    public LoginViewModel()
-    {
-        Title = "Login";
-    }
-
     /// @brief Initializes a new instance of the LoginViewModel class
     /// @param authService The authentication service instance
     /// @param navigationService The navigation service instance
@@ -123,7 +117,7 @@ public partial class LoginViewModel : BaseViewModel
     [RelayCommand]
     private async Task ForgotPasswordAsync()
     {
-        await Application.Current.MainPage.DisplayAlert(
+        await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
             "Forgot Password",
             "Password reset functionality will be implemented in a future version.",
             "OK");
