@@ -45,7 +45,13 @@
                                 <Label Text="{Binding BorrowerName, StringFormat='Borrower: {0}'}" />
                                 <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
                                 <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
-                                <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
+                                <Label Text="{Binding StatusDisplay, StringFormat='Status: {0}'}" />
+
+                                <Label Text="{Binding OverdueWarning}"
+                                       TextColor="Red"
+                                       FontAttributes="Bold"
+                                       IsVisible="{Binding IsLocallyOverdue}" />
+
                                 <Label Text="{Binding TotalPrice, StringFormat='Total: &#163;{0:F2}'}"
                                        FontAttributes="Bold" />
 
@@ -61,15 +67,16 @@
                                             CommandParameter="{Binding .}"
                                             HorizontalOptions="FillAndExpand" />
                                 </HorizontalStackLayout>
-                                    <Button Text="Mark Out for Rent"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarkOutForRentCommand}"
-                                            CommandParameter="{Binding .}"
-                                            IsVisible="{Binding CanMarkOutForRent}" />
 
-                                    <Button Text="Complete Rental"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CompleteRentalCommand}"
-                                            CommandParameter="{Binding .}"
-                                            IsVisible="{Binding CanComplete}" />
+                                <Button Text="Mark Out for Rent"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarkOutForRentCommand}"
+                                        CommandParameter="{Binding .}"
+                                        IsVisible="{Binding CanMarkOutForRent}" />
+
+                                <Button Text="Complete Rental"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CompleteRentalCommand}"
+                                        CommandParameter="{Binding .}"
+                                        IsVisible="{Binding CanComplete}" />
                             </VerticalStackLayout>
                         </Border>
                     </DataTemplate>
@@ -103,7 +110,13 @@
                                 <Label Text="{Binding OwnerName, StringFormat='Owner: {0}'}" />
                                 <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
                                 <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
-                                <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
+                                <Label Text="{Binding StatusDisplay, StringFormat='Status: {0}'}" />
+
+                                <Label Text="{Binding OverdueWarning}"
+                                       TextColor="Red"
+                                       FontAttributes="Bold"
+                                       IsVisible="{Binding IsLocallyOverdue}" />
+
                                 <Label Text="{Binding TotalPrice, StringFormat='Total: &#163;{0:F2}'}"
                                        FontAttributes="Bold" />
 

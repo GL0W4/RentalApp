@@ -41,4 +41,19 @@ public class RentalRequestItem
     public bool CanMarkReturned => RentalStatusRules.CanMarkReturned(Status);
 
     public bool CanComplete => RentalStatusRules.CanComplete(Status);
+
+    public bool IsLocallyOverdue
+    {
+        get
+        {
+            return DateTime.TryParse(EndDate, out var endDate)
+                && RentalOverdueRules.IsOverdue(Status, endDate, DateTime.Today);
+        }
+    }
+
+    public string StatusDisplay =>
+        IsLocallyOverdue ? RentalStatuses.Overdue : Status;
+
+    public string? OverdueWarning =>
+        IsLocallyOverdue ? "This rental is past its end date." : null;
 }

@@ -17,13 +17,15 @@ public partial class ItemsListViewModel : BaseViewModel
     private ObservableCollection<Item> items = new ObservableCollection<Item>();
 
     [ObservableProperty]
-    private string radiusKmText = "10";
+    private double radiusKm = 10;
 
     [ObservableProperty]
     private bool isNearbyMode;
 
     [ObservableProperty]
     private string locationSummary = string.Empty;
+
+    private const double MinimumSearchRadiusKm = 1;
 
     public ItemsListViewModel(IItemService itemService, INavigationService navigationService, ILocationService locationService)
     {
@@ -37,6 +39,18 @@ public partial class ItemsListViewModel : BaseViewModel
     private async Task NavigateToCreateItemAsync()
     {
         await _navigationService.NavigateToAsync("CreateItemPage");
+    }
+
+    [RelayCommand]
+    private void DecreaseRadius()
+    {
+        RadiusKm = Math.Max(MinimumSearchRadiusKm, Math.Round(RadiusKm) - 1);
+    }
+
+    [RelayCommand]
+    private void IncreaseRadius()
+    {
+        RadiusKm = Math.Min(ItemValidationRules.MaximumSearchRadiusKm, Math.Round(RadiusKm) + 1);
     }
 
     [RelayCommand]
@@ -79,12 +93,7 @@ public partial class ItemsListViewModel : BaseViewModel
             IsBusy = true;
             ClearError();
 
-            if (string.IsNullOrWhiteSpace(RadiusKmText) ||
-                !double.TryParse(RadiusKmText, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out var radiusKm))
-            {
-                SetError("Radius must be a valid number.");
-                return;
-            }
+            var radiusKm = RadiusKm;
 
             if (!ItemValidationRules.IsValidSearchRadius(radiusKm))
             {
