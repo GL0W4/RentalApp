@@ -42,6 +42,8 @@ public class RentalRequestItem
 
     public bool CanComplete => RentalStatusRules.CanComplete(Status);
 
+    public bool CanReview => RentalStatusRules.CanReview(Status);
+
     public bool IsLocallyOverdue
     {
         get

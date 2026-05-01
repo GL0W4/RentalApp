@@ -42,9 +42,13 @@
                                 <Label Text="{Binding ItemTitle}"
                                        FontSize="18"
                                        FontAttributes="Bold" />
+
                                 <Label Text="{Binding BorrowerName, StringFormat='Borrower: {0}'}" />
+
                                 <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
+
                                 <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
+
                                 <Label Text="{Binding StatusDisplay, StringFormat='Status: {0}'}" />
 
                                 <Label Text="{Binding OverdueWarning}"
@@ -106,10 +110,15 @@
                                 <Label Text="{Binding ItemTitle}"
                                        FontSize="18"
                                        FontAttributes="Bold" />
+
                                 <Label Text="{Binding Id, StringFormat='Rental ID: {0}'}" />
+
                                 <Label Text="{Binding OwnerName, StringFormat='Owner: {0}'}" />
+
                                 <Label Text="{Binding StartDateDisplay, StringFormat='Start: {0}'}" />
+
                                 <Label Text="{Binding EndDateDisplay, StringFormat='End: {0}'}" />
+
                                 <Label Text="{Binding StatusDisplay, StringFormat='Status: {0}'}" />
 
                                 <Label Text="{Binding OverdueWarning}"
@@ -124,6 +133,12 @@
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarkReturnedCommand}"
                                         CommandParameter="{Binding .}"
                                         IsVisible="{Binding CanMarkReturned}" />
+
+                                <Button Text="Leave Review"
+                                        TextColor="White"
+                                        IsVisible="{Binding CanReview}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.NavigateToCreateReviewCommand}"
+                                        CommandParameter="{Binding .}" />
                             </VerticalStackLayout>
                         </Border>
                     </DataTemplate>

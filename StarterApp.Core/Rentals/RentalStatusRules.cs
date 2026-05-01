@@ -30,4 +30,9 @@ public static class RentalStatusRules
     {
         return CanTransition(status, RentalStatuses.Completed);
     }
+
+    public static bool CanReview(string? status)
+{
+    return string.Equals(status, RentalStatuses.Completed, StringComparison.OrdinalIgnoreCase);
+}
 }

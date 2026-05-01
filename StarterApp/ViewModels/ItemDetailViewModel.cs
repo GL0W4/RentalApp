@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Globalization;
 using StarterApp.Database.Models;
 using StarterApp.Services;
+using System.Collections.ObjectModel;
 
 namespace StarterApp.ViewModels;
 
@@ -10,6 +11,8 @@ namespace StarterApp.ViewModels;
 public partial class ItemDetailViewModel : BaseViewModel
 {
     private readonly IItemService _itemService;
+    private readonly IReviewService _reviewService;
+
 
     [ObservableProperty]
     private int itemId;
@@ -17,11 +20,25 @@ public partial class ItemDetailViewModel : BaseViewModel
     [ObservableProperty]
     private Item? item;
 
+     [ObservableProperty]
+    private ObservableCollection<ReviewItem> reviews = new();
+
+    [ObservableProperty]
+    private double averageRating;
+
+    [ObservableProperty]
+    private int totalReviews;
+
     public string PageTitle => Item?.Title ?? "Item Detail";
 
-    public ItemDetailViewModel(IItemService itemService)
+    public bool HasReviews => TotalReviews > 0;
+
+    public bool HasNoReviews => !HasReviews;
+
+    public ItemDetailViewModel(IItemService itemService, IReviewService reviewService)
     {
         _itemService = itemService;
+        _reviewService = reviewService;
         Title = "Item Detail";
     }
 
@@ -33,6 +50,12 @@ public partial class ItemDetailViewModel : BaseViewModel
     partial void OnItemChanged(Item? value)
     {
         OnPropertyChanged(nameof(PageTitle));
+    }
+
+    partial void OnTotalReviewsChanged(int value)
+    {
+        OnPropertyChanged(nameof(HasReviews));
+        OnPropertyChanged(nameof(HasNoReviews));
     }
 
     private async Task LoadItemAsync(int itemId)
@@ -49,6 +72,8 @@ public partial class ItemDetailViewModel : BaseViewModel
             {
                 SetError("Item not found.");
             }
+
+            await LoadReviewsAsync(itemId);
         }
         catch (Exception ex)
         {
@@ -67,6 +92,21 @@ public partial class ItemDetailViewModel : BaseViewModel
             return;
 
         await Shell.Current.GoToAsync($"EditItemPage?itemId={Item.Id}");
+    }
+
+    private async Task LoadReviewsAsync(int itemId)
+    {
+        var result = await _reviewService.GetItemReviewsAsync(itemId);
+
+        Reviews.Clear();
+
+        foreach (var review in result.Reviews)
+        {
+            Reviews.Add(review);
+        }
+
+        AverageRating = result.AverageRating;
+        TotalReviews = result.TotalReviews;
     }
 
     [RelayCommand]

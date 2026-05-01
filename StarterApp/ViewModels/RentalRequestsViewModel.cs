@@ -166,6 +166,15 @@ public partial class RentalRequestsViewModel : BaseViewModel
         await UpdateRentalStatusAsync(rental, RentalStatuses.Completed);
     }
 
+    [RelayCommand]
+    private async Task NavigateToCreateReviewAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await Shell.Current.GoToAsync($"CreateReviewPage?rentalId={rental.Id}");
+    }
+
     partial void OnSelectedStatusFilterChanged(string value)
     {
         if (!IsBusy)
