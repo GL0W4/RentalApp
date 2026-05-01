@@ -93,4 +93,20 @@ public class RentalStatusRulesTests
         Assert.False(RentalStatusRules.CanMarkReturned(null));
         Assert.False(RentalStatusRules.CanComplete(null));
     }
+
+    [Theory]
+    [InlineData(RentalStatuses.Completed, true)]
+    [InlineData(RentalStatuses.Requested, false)]
+    [InlineData(RentalStatuses.Approved, false)]
+    [InlineData(RentalStatuses.OutForRent, false)]
+    [InlineData(RentalStatuses.Returned, false)]
+    [InlineData(RentalStatuses.Rejected, false)]
+    [InlineData(RentalStatuses.Overdue, false)]
+    [InlineData(null, false)]
+    public void CanReview_ReturnsExpectedResult(string? status, bool expected)
+    {
+        var result = RentalStatusRules.CanReview(status);
+
+        Assert.Equal(expected, result);
+    }
 }
