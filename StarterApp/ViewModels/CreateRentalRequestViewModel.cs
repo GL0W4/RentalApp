@@ -6,6 +6,9 @@ using StarterApp.Core.Rentals;
 
 namespace StarterApp.ViewModels;
 
+/// <summary>
+/// ViewModel for submitting a rental request for a selected item.
+/// </summary>
 [QueryProperty(nameof(ItemId), "itemId")]
 [QueryProperty(nameof(DailyRateText), "dailyRate")]
 public partial class CreateRentalRequestViewModel : BaseViewModel
@@ -26,6 +29,7 @@ public partial class CreateRentalRequestViewModel : BaseViewModel
     [ObservableProperty]
     private DateTime endDate = DateTime.Today.AddDays(1);
 
+    /// <summary>Gets the daily rate parsed from the Shell query parameter.</summary>
     public decimal DailyRate =>
     decimal.TryParse(DailyRateText, NumberStyles.Number, CultureInfo.InvariantCulture, out var rate)
         ? rate
@@ -33,12 +37,17 @@ public partial class CreateRentalRequestViewModel : BaseViewModel
 
     // AI-assisted: estimate values are calculated client-side from DateTime picker values.
     // Reviewed and modified to adapt to unit tests
+    /// <summary>Gets the number of rental days used in the client-side estimate.</summary>
     public int RentalDays =>
     RentalPriceCalculator.CalculateRentalDays(StartDate, EndDate);
 
+    /// <summary>Gets the estimated total price displayed before submission.</summary>
     public decimal EstimatedTotal =>
     RentalPriceCalculator.CalculateEstimatedTotal(DailyRate, StartDate, EndDate);
 
+    /// <summary>
+    /// Creates the rental request ViewModel with the rental workflow service.
+    /// </summary>
     public CreateRentalRequestViewModel(IRentalService rentalService)
     {
         _rentalService = rentalService;
@@ -70,6 +79,7 @@ public partial class CreateRentalRequestViewModel : BaseViewModel
         if (IsBusy)
             return;
 
+        // Date validation is performed before the request is sent to the hosted API.
         if (!ValidateForm())
             return;
 

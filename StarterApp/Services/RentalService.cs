@@ -2,35 +2,45 @@ using StarterApp.Repositories;
 
 namespace StarterApp.Services;
 
+/// <summary>
+/// Provides rental workflow operations and ensures an authenticated token is available.
+/// </summary>
 public class RentalService : IRentalService
 {
     private readonly IRentalRepository _rentalRepository;
     private readonly IAuthenticationService _authService;
 
+    /// <summary>
+    /// Creates a rental service with API repository and authentication dependencies.
+    /// </summary>
     public RentalService(IRentalRepository rentalRepository, IAuthenticationService authService)
     {
         _rentalRepository = rentalRepository;
         _authService = authService;
     }
 
+    /// <inheritdoc />
     public async Task SubmitRentalRequestAsync(CreateRentalRequest request)
     {
         var jwtToken = await GetRequiredTokenAsync();
         await _rentalRepository.SubmitRentalRequestAsync(request, jwtToken);
     }
 
+    /// <inheritdoc />
     public async Task<List<RentalRequestItem>> GetIncomingRentalsAsync(string? status = null)
     {
         var jwtToken = await GetRequiredTokenAsync();
         return await _rentalRepository.GetIncomingRentalsAsync(jwtToken, status);
     }
 
+    /// <inheritdoc />
     public async Task<List<RentalRequestItem>> GetOutgoingRentalsAsync(string? status = null)
     {
         var jwtToken = await GetRequiredTokenAsync();
         return await _rentalRepository.GetOutgoingRentalsAsync(jwtToken, status);
     }
 
+    /// <inheritdoc />
     public async Task UpdateRentalStatusAsync(int rentalId, string status)
     {
         var jwtToken = await GetRequiredTokenAsync();

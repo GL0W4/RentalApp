@@ -72,6 +72,7 @@ public partial class RegisterViewModel : BaseViewModel
         if (IsBusy)
             return;
 
+        // Client-side validation provides immediate feedback before the API call.
         if (!ValidateForm())
             return;
 

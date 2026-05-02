@@ -5,6 +5,9 @@ using StarterApp.Services;
 
 namespace StarterApp.ViewModels;
 
+/// <summary>
+/// ViewModel for submitting a review after a rental has been completed.
+/// </summary>
 [QueryProperty(nameof(RentalId), "rentalId")]
 public partial class CreateReviewViewModel : BaseViewModel
 {
@@ -21,6 +24,9 @@ public partial class CreateReviewViewModel : BaseViewModel
     [NotifyCanExecuteChangedFor(nameof(SubmitReviewCommand))]
     private string comment = string.Empty;
 
+    /// <summary>
+    /// Creates the review ViewModel with the review workflow service.
+    /// </summary>
     public CreateReviewViewModel(IReviewService reviewService)
     {
         _reviewService = reviewService;
@@ -43,6 +49,7 @@ public partial class CreateReviewViewModel : BaseViewModel
 
         ClearError();
 
+        // Local validation mirrors the API contract and gives immediate feedback.
         if (!ReviewValidationRules.IsValidRating(Rating))
         {
             SetError("Rating must be between 1 and 5.");

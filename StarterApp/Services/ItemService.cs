@@ -4,22 +4,30 @@ using StarterApp.Core.Items;
 
 namespace StarterApp.Services;
 
+/// <summary>
+/// Provides item-related business checks before delegating persistence to the API repository.
+/// </summary>
 public class ItemService : IItemService
 {
     private readonly IItemRepository _itemRepository;
     private readonly IAuthenticationService _authService;
 
+    /// <summary>
+    /// Creates an item service with API repository and authentication dependencies.
+    /// </summary>
     public ItemService(IItemRepository itemRepository, IAuthenticationService authService)
     {
         _itemRepository = itemRepository;
         _authService = authService;
     }
 
+    /// <inheritdoc />
     public async Task<List<Item>> GetItemsAsync()
     {
         return await _itemRepository.GetAllAsync();
     }
 
+    /// <inheritdoc />
     public async Task<Item> AddItemAsync(CreateItemRequest request)
     {
         var jwtToken = await _authService.GetValidTokenAsync();
@@ -32,11 +40,24 @@ public class ItemService : IItemService
         return await _itemRepository.CreateAsync(request, jwtToken);
     }
 
+    /// <inheritdoc />
     public async Task<List<ItemCategory>> GetCategoriesAsync()
     {
         return await _itemRepository.GetCategoriesAsync();
     }
 
+    /// <inheritdoc />
+    public async Task<Item?> GetItemByIdAsync(int itemId)
+    {
+        if (itemId <= 0)
+        {
+            throw new ArgumentException("Item ID must be valid.", nameof(itemId));
+        }
+
+        return await _itemRepository.GetByIdAsync(itemId);
+    }
+
+    /// <inheritdoc />
     public async Task<Item> UpdateItemAsync(int itemId, UpdateItemRequest request)
     {
         var jwtToken = await _authService.GetValidTokenAsync();
@@ -49,6 +70,7 @@ public class ItemService : IItemService
         return await _itemRepository.UpdateAsync(itemId, request, jwtToken);
     }
 
+    /// <inheritdoc />
     public async Task<List<Item>> GetNearbyItemsAsync(double latitude, double longitude, double radiusKm, string? category = null)
     {
         if (!ItemValidationRules.IsValidLatitude(latitude))

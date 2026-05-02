@@ -3,17 +3,24 @@ using StarterApp.Repositories;
 
 namespace StarterApp.Services;
 
+/// <summary>
+/// Provides review workflow validation before calling the hosted API.
+/// </summary>
 public class ReviewService : IReviewService
 {
     private readonly IReviewRepository _reviewRepository;
     private readonly IAuthenticationService _authService;
 
+    /// <summary>
+    /// Creates a review service with API repository and authentication dependencies.
+    /// </summary>
     public ReviewService(IReviewRepository reviewRepository, IAuthenticationService authService)
     {
         _reviewRepository = reviewRepository;
         _authService = authService;
     }
 
+    /// <inheritdoc />
     public async Task<ItemReviewsResult> GetItemReviewsAsync(int itemId, int page = 1, int pageSize = 10)
     {
         if (itemId <= 0)
@@ -24,6 +31,7 @@ public class ReviewService : IReviewService
         return await _reviewRepository.GetItemReviewsAsync(itemId, page, pageSize);
     }
 
+    /// <inheritdoc />
     public async Task<ReviewItem> CreateReviewAsync(int rentalId, int rating, string? comment)
     {
         if (rentalId <= 0)

@@ -4,10 +4,16 @@ using StarterApp.Services;
 
 namespace StarterApp.Repositories;
 
+/// <summary>
+/// API client for rental request workflow operations.
+/// </summary>
 public class RentalRepository : IRentalRepository
 {
     private readonly HttpClient _httpClient;
 
+    /// <summary>
+    /// Creates a repository with the configured hosted API base address.
+    /// </summary>
     public RentalRepository()
     {
         _httpClient = new HttpClient
@@ -16,6 +22,7 @@ public class RentalRepository : IRentalRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task SubmitRentalRequestAsync(CreateRentalRequest request, string jwtToken)
     {
         using var message = new HttpRequestMessage(HttpMethod.Post, "/rentals");
@@ -28,6 +35,7 @@ public class RentalRepository : IRentalRepository
         {
             var errorBody = await response.Content.ReadAsStringAsync();
 
+            // Convert API failure details into user-facing rental request validation messages.
             if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
             {
                throw new Exception("This item is already booked for the selected dates.");
@@ -60,12 +68,14 @@ public class RentalRepository : IRentalRepository
         }
     }
 
+    /// <inheritdoc />
     public async Task<List<RentalRequestItem>> GetIncomingRentalsAsync(string jwtToken, string? status = null)
     {
         var url = "/rentals/incoming";
 
         if (!string.IsNullOrWhiteSpace(status))
         {
+            // Status filtering is performed by the API to keep the client list simple.
             url += $"?status={Uri.EscapeDataString(status)}";
         }
 
@@ -83,12 +93,14 @@ public class RentalRepository : IRentalRepository
         return result?.Rentals ?? new List<RentalRequestItem>();
     }
 
+    /// <inheritdoc />
     public async Task<List<RentalRequestItem>> GetOutgoingRentalsAsync(string jwtToken, string? status = null)
     {
         var url = "/rentals/outgoing";
 
         if (!string.IsNullOrWhiteSpace(status))
         {
+            // Status filtering is performed by the API for consistency with incoming rentals.
             url += $"?status={Uri.EscapeDataString(status)}";
         }
 
@@ -106,6 +118,7 @@ public class RentalRepository : IRentalRepository
         return result?.Rentals ?? new List<RentalRequestItem>();
     }
 
+    /// <inheritdoc />
     public async Task UpdateRentalStatusAsync(int rentalId, string status, string jwtToken)
     {
         var request = new UpdateRentalStatusRequest
@@ -123,6 +136,7 @@ public class RentalRepository : IRentalRepository
         {
             var errorBody = await response.Content.ReadAsStringAsync();
 
+            // The server owns final authorization and transition validation.
             if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
             {
                 throw new Exception("You can only update rental requests you are involved in.");

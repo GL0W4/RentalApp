@@ -7,6 +7,9 @@ using System.Globalization;
 
 namespace StarterApp.ViewModels;
 
+/// <summary>
+/// ViewModel for editing an existing item listing owned by the authenticated user.
+/// </summary>
 [QueryProperty(nameof(ItemId), "itemId")]
 public partial class EditItemViewModel : BaseViewModel
 {
@@ -28,6 +31,9 @@ public partial class EditItemViewModel : BaseViewModel
     [ObservableProperty]
     private bool isAvailable = true;
 
+    /// <summary>
+    /// Creates the edit-item ViewModel with item workflow and navigation dependencies.
+    /// </summary>
     public EditItemViewModel(IItemService itemService, INavigationService navigationService)
     {
         _itemService = itemService;
@@ -77,6 +83,7 @@ public partial class EditItemViewModel : BaseViewModel
         if (IsBusy)
             return;
 
+        // Validate locally before delegating ownership and persistence checks to the API.
         if (!ValidateForm(out var dailyRate))
             return;
 

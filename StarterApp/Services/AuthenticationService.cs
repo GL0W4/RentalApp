@@ -3,21 +3,32 @@ using Microsoft.Maui.Storage;
 
 namespace StarterApp.Services;
 
+/// <summary>
+/// Handles authentication with the hosted API and stores JWT session details securely.
+/// </summary>
 public class AuthenticationService : IAuthenticationService
 {
     private readonly HttpClient _httpClient;
 
+    /// <inheritdoc />
     public event EventHandler<bool>? AuthenticationStateChanged;
 
+    /// <inheritdoc />
     public string? JwtToken { get; private set; }
+    /// <inheritdoc />
     public DateTime? TokenExpiresAt { get; private set; }
+    /// <inheritdoc />
     public int? CurrentUserId { get; private set; }
 
+    /// <inheritdoc />
     public bool IsAuthenticated =>
         !string.IsNullOrWhiteSpace(JwtToken) &&
         TokenExpiresAt.HasValue &&
         TokenExpiresAt > DateTime.UtcNow;
 
+    /// <summary>
+    /// Creates the HTTP client used for authentication requests.
+    /// </summary>
     public AuthenticationService()
     {
         _httpClient = new HttpClient
@@ -26,6 +37,7 @@ public class AuthenticationService : IAuthenticationService
         };
     }
 
+    /// <inheritdoc />
     public async Task<AuthenticationResult> LoginAsync(string email, string password)
     {
         try
@@ -55,6 +67,7 @@ public class AuthenticationService : IAuthenticationService
             TokenExpiresAt = result.ExpiresAt;
             CurrentUserId = result.UserId;
 
+            // Store the token securely so the session can survive app restarts until expiry.
             await SecureStorage.SetAsync("jwt_token", JwtToken);
             await SecureStorage.SetAsync("jwt_expires_at", TokenExpiresAt.Value.ToString("O"));
             await SecureStorage.SetAsync("jwt_user_id", CurrentUserId?.ToString() ?? string.Empty);
@@ -74,6 +87,7 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
+    /// <inheritdoc />
     public async Task<AuthenticationResult> RegisterAsync(string firstName, string lastName, string email, string password)
     {
         try
@@ -102,11 +116,13 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
+    /// <inheritdoc />
     public async Task<string?> GetValidTokenAsync()
     {
         if (IsAuthenticated)
             return JwtToken;
 
+        // Rehydrate token state only if the persisted token has not expired.
         var token = await SecureStorage.GetAsync("jwt_token");
         var expiresAtRaw = await SecureStorage.GetAsync("jwt_expires_at");
         var userIdRaw = await SecureStorage.GetAsync("jwt_user_id");
@@ -129,6 +145,7 @@ public class AuthenticationService : IAuthenticationService
         return JwtToken;
     }
 
+    /// <inheritdoc />
     public async Task LogoutAsync()
     {
         JwtToken = null;

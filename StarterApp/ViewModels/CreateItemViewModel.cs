@@ -7,6 +7,9 @@ using System.Globalization;
 
 namespace StarterApp.ViewModels;
 
+/// <summary>
+/// ViewModel for the create-item page; manages form state, validation, and listing submission.
+/// </summary>
 public partial class CreateItemViewModel : BaseViewModel
 {
     private readonly INavigationService _navigationService;
@@ -33,6 +36,9 @@ public partial class CreateItemViewModel : BaseViewModel
     [ObservableProperty]
     private string longitudeText = "-3.1883";
 
+    /// <summary>
+    /// Creates the ViewModel and begins loading category options for the picker.
+    /// </summary>
     public CreateItemViewModel(IItemService itemService, INavigationService navigationService)
     {
         _itemService = itemService;
@@ -69,6 +75,7 @@ public partial class CreateItemViewModel : BaseViewModel
         if (IsBusy)
             return;
 
+        // Keep client-side validation close to the form so API calls are only made with sensible input.
         if (!ValidateForm(out var dailyRate, out var latitude, out var longitude))
             return;
 

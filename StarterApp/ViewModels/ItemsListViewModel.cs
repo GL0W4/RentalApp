@@ -7,6 +7,9 @@ using StarterApp.Core.Items;
 
 namespace StarterApp.ViewModels;
 
+/// <summary>
+/// ViewModel for browsing all items and performing nearby item discovery.
+/// </summary>
 public partial class ItemsListViewModel : BaseViewModel
 {
     private readonly IItemService _itemService;
@@ -27,6 +30,9 @@ public partial class ItemsListViewModel : BaseViewModel
 
     private const double MinimumSearchRadiusKm = 1;
 
+    /// <summary>
+    /// Creates the item list ViewModel with item, navigation, and location services.
+    /// </summary>
     public ItemsListViewModel(IItemService itemService, INavigationService navigationService, ILocationService locationService)
     {
         _itemService = itemService;
@@ -53,6 +59,9 @@ public partial class ItemsListViewModel : BaseViewModel
         RadiusKm = Math.Min(ItemValidationRules.MaximumSearchRadiusKm, Math.Round(RadiusKm) + 1);
     }
 
+    /// <summary>
+    /// Loads all item listings from the hosted API.
+    /// </summary>
     [RelayCommand]
     public async Task LoadItemsAsync()
     {
@@ -101,6 +110,7 @@ public partial class ItemsListViewModel : BaseViewModel
                 return;
             }
 
+            // Location lookup is abstracted to support both device GPS and the development fallback.
             var location = await _locationService.GetCurrentLocationAsync();
 
             var nearbyItems = await _itemService.GetNearbyItemsAsync(

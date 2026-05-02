@@ -7,6 +7,9 @@ using System.Collections.ObjectModel;
 
 namespace StarterApp.ViewModels;
 
+/// <summary>
+/// ViewModel for displaying a selected item, its reviews, and related item actions.
+/// </summary>
 [QueryProperty(nameof(ItemId), "itemId")]
 public partial class ItemDetailViewModel : BaseViewModel
 {
@@ -29,12 +32,18 @@ public partial class ItemDetailViewModel : BaseViewModel
     [ObservableProperty]
     private int totalReviews;
 
+    /// <summary>Gets the title displayed by the item detail page.</summary>
     public string PageTitle => Item?.Title ?? "Item Detail";
 
+    /// <summary>Gets whether review data is available for display.</summary>
     public bool HasReviews => TotalReviews > 0;
 
+    /// <summary>Gets whether the no-reviews message should be displayed.</summary>
     public bool HasNoReviews => !HasReviews;
 
+    /// <summary>
+    /// Creates the item detail ViewModel with item and review workflow services.
+    /// </summary>
     public ItemDetailViewModel(IItemService itemService, IReviewService reviewService)
     {
         _itemService = itemService;
@@ -65,12 +74,12 @@ public partial class ItemDetailViewModel : BaseViewModel
             IsBusy = true;
             ClearError();
 
-            var items = await _itemService.GetItemsAsync();
-            Item = items.FirstOrDefault(i => i.Id == itemId);
+            Item = await _itemService.GetItemByIdAsync(itemId);
 
             if (Item == null)
             {
                 SetError("Item not found.");
+                return;
             }
 
             await LoadReviewsAsync(itemId);
@@ -105,7 +114,7 @@ public partial class ItemDetailViewModel : BaseViewModel
             Reviews.Add(review);
         }
 
-        AverageRating = result.AverageRating;
+        AverageRating = result.AverageRating ?? 0;
         TotalReviews = result.TotalReviews;
     }
 

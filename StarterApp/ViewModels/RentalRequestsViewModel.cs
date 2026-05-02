@@ -6,6 +6,9 @@ using StarterApp.Core.Rentals;
 
 namespace StarterApp.ViewModels;
 
+/// <summary>
+/// ViewModel for viewing incoming/outgoing rental requests and progressing rental statuses.
+/// </summary>
 public partial class RentalRequestsViewModel : BaseViewModel
 {
     private readonly IRentalService _rentalService;
@@ -32,6 +35,9 @@ public partial class RentalRequestsViewModel : BaseViewModel
     [ObservableProperty]
     private string selectedStatusFilter = "All";
 
+    /// <summary>
+    /// Creates the rental requests ViewModel with the rental workflow service.
+    /// </summary>
     public RentalRequestsViewModel(IRentalService rentalService)
     {
         _rentalService = rentalService;
@@ -63,6 +69,7 @@ public partial class RentalRequestsViewModel : BaseViewModel
     private async Task LoadRentalListsAsync()
     {
 
+        // The API accepts a null status to mean no filtering.
         var status = SelectedStatusFilter == "All" ? null : SelectedStatusFilter;
 
         var incoming = await _rentalService.GetIncomingRentalsAsync(status);
@@ -104,6 +111,7 @@ public partial class RentalRequestsViewModel : BaseViewModel
         if (IsBusy)
             return;
 
+        // Status changes are confirmed because they affect both borrower and owner workflows.
         var confirm = await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
             $"{status} Request",
             $"{status} rental request for '{rental.ItemTitle}'?",

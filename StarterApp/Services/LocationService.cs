@@ -2,10 +2,14 @@ namespace StarterApp.Services;
 
 
 
+/// <summary>
+/// Retrieves device location for nearby item discovery.
+/// </summary>
 public class LocationService : ILocationService
 {
     private static readonly bool UseDevelopmentLocation = true;
 
+    /// <inheritdoc />
     public async Task<LocationResult> GetCurrentLocationAsync()
     {
         if (UseDevelopmentLocation)
