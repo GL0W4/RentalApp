@@ -53,8 +53,7 @@ public partial class EditItemViewModel : BaseViewModel
             IsBusy = true;
             ClearError();
 
-            var items = await _itemService.GetItemsAsync();
-            var item = items.FirstOrDefault(i => i.Id == itemId);
+            var item = await _itemService.GetItemByIdAsync(itemId);
 
             if (item == null)
             {
