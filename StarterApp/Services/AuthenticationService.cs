@@ -1,56 +1,85 @@
-using Microsoft.EntityFrameworkCore;
-using StarterApp.Database.Data;
-using StarterApp.Database.Models;
-using BCrypt.Net;
+using System.Net.Http.Json;
+using Microsoft.Maui.Storage;
 
 namespace StarterApp.Services;
 
+/// <summary>
+/// Handles authentication with the hosted API and stores JWT session details securely.
+/// </summary>
 public class AuthenticationService : IAuthenticationService
 {
-    private readonly AppDbContext _context;
-    private User? _currentUser;
-    private List<string> _currentUserRoles = new();
+    private readonly HttpClient _httpClient;
 
+    /// <inheritdoc />
     public event EventHandler<bool>? AuthenticationStateChanged;
 
-    public AuthenticationService(AppDbContext context)
+    /// <inheritdoc />
+    public string? JwtToken { get; private set; }
+    /// <inheritdoc />
+    public DateTime? TokenExpiresAt { get; private set; }
+    /// <inheritdoc />
+    public int? CurrentUserId { get; private set; }
+
+    /// <inheritdoc />
+    public bool IsAuthenticated =>
+        !string.IsNullOrWhiteSpace(JwtToken) &&
+        TokenExpiresAt.HasValue &&
+        TokenExpiresAt > DateTime.UtcNow;
+
+    /// <summary>
+    /// Creates the HTTP client used for authentication requests.
+    /// </summary>
+    public AuthenticationService()
     {
-        _context = context;
+        _httpClient = new HttpClient
+        {
+            BaseAddress = new Uri("https://set09102-api.b-davison.workers.dev")
+        };
     }
 
-    public bool IsAuthenticated => _currentUser != null;
-
-    public User? CurrentUser => _currentUser;
-
-    public List<string> CurrentUserRoles => _currentUserRoles;
-
+    /// <inheritdoc />
     public async Task<AuthenticationResult> LoginAsync(string email, string password)
     {
         try
         {
-            var user = await _context.Users
-                .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
-
-            if (user == null)
+            var request = new
             {
-                return new AuthenticationResult(false, "Invalid email or password");
+                email,
+                password
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("/auth/token", request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var message = await ExtractErrorMessageAsync(response, "Invalid email or password.", true);
+    return new AuthenticationResult(false, message);
             }
 
-            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            var result = await response.Content.ReadFromJsonAsync<AuthTokenResponse>();
+
+            if (result == null || string.IsNullOrWhiteSpace(result.Token))
             {
-                return new AuthenticationResult(false, "Invalid email or password");
+                return new AuthenticationResult(false, "Login failed: invalid token response.");
             }
 
-            _currentUser = user;
-            _currentUserRoles = user.UserRoles
-                .Where(ur => ur.IsActive)
-                .Select(ur => ur.Role.Name)
-                .ToList();
+            JwtToken = result.Token;
+            TokenExpiresAt = result.ExpiresAt;
+            CurrentUserId = result.UserId;
+
+            // Store the token securely so the session can survive app restarts until expiry.
+            await SecureStorage.SetAsync("jwt_token", JwtToken);
+            await SecureStorage.SetAsync("jwt_expires_at", TokenExpiresAt.Value.ToString("O"));
+            await SecureStorage.SetAsync("jwt_user_id", CurrentUserId?.ToString() ?? string.Empty);
 
             AuthenticationStateChanged?.Invoke(this, true);
-            return new AuthenticationResult(true, "Login successful");
+
+            return new AuthenticationResult(
+                true,
+                "Login successful",
+                JwtToken,
+                TokenExpiresAt,
+                CurrentUserId);
         }
         catch (Exception ex)
         {
@@ -58,44 +87,25 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
+    /// <inheritdoc />
     public async Task<AuthenticationResult> RegisterAsync(string firstName, string lastName, string email, string password)
     {
         try
         {
-            // Check if user already exists
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (existingUser != null)
+            var request = new
             {
-                return new AuthenticationResult(false, "User with this email already exists");
-            }
-
-            // Create password hash
-            var salt = BCrypt.Net.BCrypt.GenerateSalt();
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
-
-            // Create new user
-            var user = new User
-            {
-                FirstName = firstName,
-                LastName = lastName,
-                Email = email,
-                PasswordHash = hashedPassword,
-                PasswordSalt = salt,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                IsActive = true
+                firstName,
+                lastName,
+                email,
+                password
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var response = await _httpClient.PostAsJsonAsync("/auth/register", request);
 
-            // Assign default "User" role
-            var userRole = await _context.Roles.FirstOrDefaultAsync(r => r.IsDefault == true);
-            if (userRole != null)
+            if (!response.IsSuccessStatusCode)
             {
-                var userRoleAssignment = new UserRole(user.Id, userRole.Id);
-                _context.UserRoles.Add(userRoleAssignment);
-                await _context.SaveChangesAsync();
+                var message = await ExtractErrorMessageAsync(response, "Invalid email or password.", false);
+                return new AuthenticationResult(false, message);
             }
 
             return new AuthenticationResult(true, "Registration successful");
@@ -106,68 +116,109 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
-    public Task LogoutAsync()
+    /// <inheritdoc />
+    public async Task<string?> GetValidTokenAsync()
     {
-        _currentUser = null;
-        _currentUserRoles.Clear();
+        if (IsAuthenticated)
+            return JwtToken;
+
+        // Rehydrate token state only if the persisted token has not expired.
+        var token = await SecureStorage.GetAsync("jwt_token");
+        var expiresAtRaw = await SecureStorage.GetAsync("jwt_expires_at");
+        var userIdRaw = await SecureStorage.GetAsync("jwt_user_id");
+
+        if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(expiresAtRaw))
+            return null;
+
+        if (!DateTime.TryParse(expiresAtRaw, out var expiresAt))
+            return null;
+
+        if (expiresAt <= DateTime.UtcNow)
+            return null;
+
+        JwtToken = token;
+        TokenExpiresAt = expiresAt;
+
+        if (int.TryParse(userIdRaw, out var userId))
+            CurrentUserId = userId;
+
+        return JwtToken;
+    }
+
+    /// <inheritdoc />
+    public async Task LogoutAsync()
+    {
+        JwtToken = null;
+        TokenExpiresAt = null;
+        CurrentUserId = null;
+
+        SecureStorage.Remove("jwt_token");
+        SecureStorage.Remove("jwt_expires_at");
+        SecureStorage.Remove("jwt_user_id");
+
         AuthenticationStateChanged?.Invoke(this, false);
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
-    public bool HasRole(string roleName)
+    private class AuthTokenResponse
     {
-        return _currentUserRoles.Contains(roleName, StringComparer.OrdinalIgnoreCase);
+        public string Token { get; set; } = string.Empty;
+        public DateTime ExpiresAt { get; set; }
+        public int UserId { get; set; }
     }
 
-    public bool HasAnyRole(params string[] roleNames)
+    private async Task<string> ExtractErrorMessageAsync(
+    HttpResponseMessage response,
+    string fallbackMessage,
+    bool isLoginFlow)
+{
+    try
     {
-        return roleNames.Any(role => HasRole(role));
-    }
+        var errorBody = await response.Content.ReadAsStringAsync();
 
-    public bool HasAllRoles(params string[] roleNames)
-    {
-        return roleNames.All(role => HasRole(role));
-    }
+        if (string.IsNullOrWhiteSpace(errorBody))
+            return fallbackMessage;
 
-    public async Task<bool> ChangePasswordAsync(string currentPassword, string newPassword)
-    {
-        if (_currentUser == null)
-            return false;
-
-        try
+        if (errorBody.Contains("email already exists", StringComparison.OrdinalIgnoreCase) ||
+            errorBody.Contains("already exists", StringComparison.OrdinalIgnoreCase))
         {
-            if (!BCrypt.Net.BCrypt.Verify(currentPassword, _currentUser.PasswordHash))
-            {
-                return false;
-            }
-
-            var salt = BCrypt.Net.BCrypt.GenerateSalt();
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword, salt);
-
-            _currentUser.PasswordHash = hashedPassword;
-            _currentUser.PasswordSalt = salt;
-            _currentUser.UpdatedAt = DateTime.UtcNow;
-
-            _context.Users.Update(_currentUser);
-            await _context.SaveChangesAsync();
-
-            return true;
+            return "An account with this email already exists.";
         }
-        catch
+
+        if (errorBody.Contains("uppercase", StringComparison.OrdinalIgnoreCase))
         {
-            return false;
+            return "Password must contain at least one uppercase letter.";
         }
+
+        if (errorBody.Contains("number", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Password must contain at least one number.";
+        }
+
+        if (errorBody.Contains("special character", StringComparison.OrdinalIgnoreCase) ||
+            errorBody.Contains("special", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Password must contain at least one special character.";
+        }
+
+        if (isLoginFlow &&
+            (errorBody.Contains("invalid", StringComparison.OrdinalIgnoreCase) ||
+             errorBody.Contains("unauthorized", StringComparison.OrdinalIgnoreCase)))
+        {
+            return "Invalid email or password.";
+        }
+
+        if (!isLoginFlow &&
+            errorBody.Contains("validation", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Please check your registration details and try again.";
+        }
+
+        return fallbackMessage;
+    }
+    catch
+    {
+        return fallbackMessage;
     }
 }
-
-public class AuthenticationResult
-{
-    public bool IsSuccess { get; }
-    public string Message { get; }
-
-    public AuthenticationResult(bool isSuccess, string message)
-    {
-        IsSuccess = isSuccess;
-        Message = message;
-    }
 }

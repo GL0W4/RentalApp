@@ -1,0 +1,193 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using StarterApp.Services;
+using System.Collections.ObjectModel;
+using StarterApp.Core.Rentals;
+
+namespace StarterApp.ViewModels;
+
+/// <summary>
+/// ViewModel for viewing incoming/outgoing rental requests and progressing rental statuses.
+/// </summary>
+public partial class RentalRequestsViewModel : BaseViewModel
+{
+    private readonly IRentalService _rentalService;
+
+    [ObservableProperty]
+    private ObservableCollection<RentalRequestItem> incomingRentals = new();
+
+    [ObservableProperty]
+    private ObservableCollection<RentalRequestItem> outgoingRentals = new();
+    
+    [ObservableProperty]
+    private ObservableCollection<string> statusFilters = new()
+    {
+        "All",
+        RentalStatuses.Requested,
+        RentalStatuses.Approved,
+        RentalStatuses.Rejected,
+        RentalStatuses.OutForRent,
+        RentalStatuses.Overdue,
+        RentalStatuses.Returned,
+        RentalStatuses.Completed
+    };
+
+    [ObservableProperty]
+    private string selectedStatusFilter = "All";
+
+    /// <summary>
+    /// Creates the rental requests ViewModel with the rental workflow service.
+    /// </summary>
+    public RentalRequestsViewModel(IRentalService rentalService)
+    {
+        _rentalService = rentalService;
+        Title = "Rental Requests";
+    }
+
+    [RelayCommand]
+    private async Task LoadRentalsAsync()
+    {
+        if (IsBusy)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            ClearError();
+
+            await LoadRentalListsAsync();
+        }
+        catch (Exception ex)
+        {
+            SetError($"Failed to load rental requests: {ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+    private async Task LoadRentalListsAsync()
+    {
+
+        // The API accepts a null status to mean no filtering.
+        var status = SelectedStatusFilter == "All" ? null : SelectedStatusFilter;
+
+        var incoming = await _rentalService.GetIncomingRentalsAsync(status);
+        var outgoing = await _rentalService.GetOutgoingRentalsAsync(status);
+
+        IncomingRentals.Clear();
+        foreach (var rental in incoming)
+        {
+            IncomingRentals.Add(rental);
+        }
+
+        OutgoingRentals.Clear();
+        foreach (var rental in outgoing)
+        {
+            OutgoingRentals.Add(rental);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ApproveRentalAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await UpdateRentalStatusAsync(rental, RentalStatuses.Approved);
+    }
+
+    [RelayCommand]
+    private async Task RejectRentalAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await UpdateRentalStatusAsync(rental, RentalStatuses.Rejected);
+    }
+
+    private async Task UpdateRentalStatusAsync(RentalRequestItem rental, string status)
+    {
+        if (IsBusy)
+            return;
+
+        // Status changes are confirmed because they affect both borrower and owner workflows.
+        var confirm = await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
+            $"{status} Request",
+            $"{status} rental request for '{rental.ItemTitle}'?",
+            status,
+            "Cancel");
+
+        if (!confirm)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            ClearError();
+
+            await _rentalService.UpdateRentalStatusAsync(rental.Id, status);
+
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
+                "Success",
+                $"Rental request {status.ToLower()} successfully.",
+                "OK");
+
+            await LoadRentalListsAsync();
+        }
+        catch (Exception ex)
+        {
+            SetError($"Failed to update rental status: {ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+        
+    }
+
+    [RelayCommand]
+    private async Task MarkOutForRentAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await UpdateRentalStatusAsync(rental, RentalStatuses.OutForRent);
+    }
+
+    [RelayCommand]
+    private async Task MarkReturnedAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await UpdateRentalStatusAsync(rental, RentalStatuses.Returned);
+    }
+
+    [RelayCommand]
+    private async Task CompleteRentalAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await UpdateRentalStatusAsync(rental, RentalStatuses.Completed);
+    }
+
+    [RelayCommand]
+    private async Task NavigateToCreateReviewAsync(RentalRequestItem rental)
+    {
+        if (rental == null)
+            return;
+
+        await Shell.Current.GoToAsync($"CreateReviewPage?rentalId={rental.Id}");
+    }
+
+    partial void OnSelectedStatusFilterChanged(string value)
+    {
+        if (!IsBusy)
+        {
+            LoadRentalsCommand.Execute(null);
+        }
+    }
+}

@@ -298,7 +298,7 @@ public partial class UserDetailViewModel : INotifyPropertyChanged
     /// Gets whether the current user can be deleted (not new user and not the currently logged-in user).
     /// </summary>
     /// <value>True if the user can be deleted, false otherwise</value>
-    public bool CanDeleteCurrentUser => !IsNewUser && _currentUser?.Id != _authService.CurrentUser?.Id;
+    public bool CanDeleteCurrentUser => false; // Prevent deletion of any user for safety in this demo
 
     #endregion
 
@@ -340,82 +340,9 @@ public partial class UserDetailViewModel : INotifyPropertyChanged
     /// <exception cref="UnauthorizedAccessException">Thrown when user doesn't have admin role</exception>
     private async Task LoadUserAsync()
     {
-        if (!_authService.HasRole(RoleConstants.Admin))
+        if (true)
         {
             await _navigationService.NavigateToAsync("MainPage");
-            return;
-        }
-
-        IsLoading = true;
-        try
-        {
-            // Load all roles first
-            var allRoles = await _context.Roles.ToListAsync();
-            
-            if (UserId == 0)
-            {
-                // New user
-                IsNewUser = true;
-                _currentUser = null;
-                FirstName = string.Empty;
-                LastName = string.Empty;
-                Email = string.Empty;
-                Password = string.Empty;
-                ConfirmPassword = string.Empty;
-                IsActive = true;
-
-                AvailableRoles = new ObservableCollection<RoleItem>(
-                    allRoles.Select(r => new RoleItem 
-                    { 
-                        Id = r.Id, 
-                        Name = r.Name, 
-                        Description = r.Description, 
-                        IsAssigned = false 
-                    }));
-            }
-            else
-            {
-                // Existing user
-                IsNewUser = false;
-                _currentUser = await _context.Users
-                    .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role)
-                    .FirstOrDefaultAsync(u => u.Id == UserId);
-
-                if (_currentUser == null)
-                {
-                    ErrorMessage = "User not found";
-                    return;
-                }
-
-                FirstName = _currentUser.FirstName;
-                LastName = _currentUser.LastName;
-                Email = _currentUser.Email;
-                IsActive = _currentUser.IsActive;
-
-                var userRoleIds = _currentUser.UserRoles.Where(ur => ur.IsActive).Select(ur => ur.RoleId).ToList();
-                
-                AvailableRoles = new ObservableCollection<RoleItem>(
-                    allRoles.Select(r => new RoleItem 
-                    { 
-                        Id = r.Id, 
-                        Name = r.Name, 
-                        Description = r.Description, 
-                        IsAssigned = userRoleIds.Contains(r.Id) 
-                    }));
-            }
-
-            OnPropertyChanged(nameof(PageTitle));
-            OnPropertyChanged(nameof(ShowPasswordFields));
-            OnPropertyChanged(nameof(CanDeleteCurrentUser));
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = $"Error loading user: {ex.Message}";
-        }
-        finally
-        {
-            IsLoading = false;
         }
     }
 
@@ -576,7 +503,7 @@ public partial class UserDetailViewModel : INotifyPropertyChanged
     {
         if (_currentUser == null) return;
 
-        var result = await Application.Current!.MainPage!.DisplayAlert(
+        var result = await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
             "Confirm Delete",
             $"Are you sure you want to delete user '{_currentUser.FullName}'? This action cannot be undone.",
             "Delete",

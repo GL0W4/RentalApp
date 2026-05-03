@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="StarterApp.Views.ItemsListPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}">
+
+        <Grid Padding="20" RowDefinitions="Auto,*" RowSpacing="15">
+
+            <VerticalStackLayout Grid.Row="0" Spacing="10">
+
+                <Button Text="Create Item"
+                        Command="{Binding NavigateToCreateItemCommand}" />
+
+                <Label Text="Location Search"
+                       FontSize="16"
+                       FontAttributes="Bold" />
+
+                <Label Text="{Binding RadiusKm, StringFormat='Radius: {0:F0} km'}"
+                       FontSize="14" />
+
+                <Grid ColumnDefinitions="Auto,*,Auto"
+                      ColumnSpacing="10">
+
+                    <Button Grid.Column="0"
+                            Text="-"
+                            WidthRequest="44"
+                            HeightRequest="40"
+                            CornerRadius="12"
+                            Command="{Binding DecreaseRadiusCommand}" />
+
+                    <Slider Grid.Column="1"
+                            Minimum="1"
+                            Maximum="50"
+                            Value="{Binding RadiusKm}"
+                            MinimumTrackColor="#512BD4"
+                            MaximumTrackColor="#D6D6D6"
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="Center" />
+
+                    <Button Grid.Column="2"
+                            Text="+"
+                            WidthRequest="44"
+                            HeightRequest="40"
+                            CornerRadius="12"
+                            Command="{Binding IncreaseRadiusCommand}" />
+                </Grid>
+
+                <Label Text="Use -/+ for exact radius"
+                       FontSize="11"
+                       Opacity="0.7" />
+
+                <Grid ColumnDefinitions="*,*"
+                      ColumnSpacing="10">
+
+                    <Button Grid.Column="0"
+                            Text="Find Near Me"
+                            Command="{Binding LoadNearbyItemsCommand}" />
+
+                    <Button Grid.Column="1"
+                            Text="Show All"
+                            Command="{Binding LoadItemsCommand}" />
+                </Grid>
+
+                <Label Text="{Binding LocationSummary}"
+                       FontSize="12"
+                       IsVisible="{Binding IsNearbyMode}" />
+
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="Red"
+                       IsVisible="{Binding HasError}" />
+
+            </VerticalStackLayout>
+
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding Items}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeThickness="1"
+                                Padding="12"
+                                Margin="0,0,0,10">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenItemDetailCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="{Binding Title}"
+                                       FontSize="18"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding Distance, StringFormat='Distance: {0:F1} km'}"
+                                       IsVisible="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IsNearbyMode}" />
+                                <Label Text="{Binding Description}"
+                                       FontSize="13" />
+                                <Label Text="{Binding Category}"
+                                       FontSize="12" />
+                                <Label Text="{Binding OwnerName, StringFormat='Owner: {0}'}"
+                                       FontSize="12" />
+                                <Label Text="{Binding DailyRate, StringFormat='£{0:F2} / day'}"
+                                       FontSize="14"
+                                       FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
+</ContentPage>

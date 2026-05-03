@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarterApp.Services;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace StarterApp.ViewModels;
 
@@ -51,14 +52,6 @@ public partial class RegisterViewModel : BaseViewModel
     [ObservableProperty]
     private bool acceptTerms;
 
-    /// @brief Default constructor for design-time support
-    /// @details Sets the title to "Register"
-    public RegisterViewModel()
-    {
-        // Default constructor for design time support
-        Title = "Register";
-    }
-
     /// @brief Initializes a new instance of the RegisterViewModel class
     /// @param authService The authentication service instance
     /// @param navigationService The navigation service instance
@@ -79,6 +72,7 @@ public partial class RegisterViewModel : BaseViewModel
         if (IsBusy)
             return;
 
+        // Client-side validation provides immediate feedback before the API call.
         if (!ValidateForm())
             return;
 
@@ -91,7 +85,11 @@ public partial class RegisterViewModel : BaseViewModel
 
             if (result.IsSuccess)
             {
-                await Application.Current.MainPage.DisplayAlert("Success", "Registration successful! Please login.", "OK");
+                await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
+                    "Success",
+                    "Registration successful! Please login.",
+                    "OK");
+
                 await _navigationService.NavigateBackAsync();
             }
             else
@@ -156,6 +154,24 @@ public partial class RegisterViewModel : BaseViewModel
         if (Password.Length < 6)
         {
             SetError("Password must be at least 6 characters long");
+            return false;
+        }
+
+        if (!Password.Any(char.IsUpper))
+        {
+            SetError("Password must contain at least one uppercase letter");
+            return false;
+        }
+
+        if (!Password.Any(char.IsDigit))
+        {
+            SetError("Password must contain at least one number");
+            return false;
+        }
+
+        if (!Password.Any(c => !char.IsLetterOrDigit(c)))
+        {
+            SetError("Password must contain at least one special character");
             return false;
         }
 

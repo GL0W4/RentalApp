@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="StarterApp.Views.ItemDetailPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding PageTitle}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}" />
+
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   IsVisible="{Binding HasError}" />
+
+            <Label Text="{Binding Item.Title}"
+                   FontSize="26"
+                   FontAttributes="Bold" />
+
+            <Label Text="{Binding Item.Id, StringFormat='ID: {0}'}"
+                   FontSize="26"
+                   FontAttributes="Bold" />
+
+            <Label Text="{Binding Item.Description}"
+                   FontSize="16" />
+
+            <Label Text="{Binding Item.Category, StringFormat='Category: {0}'}"
+                   FontSize="14" />
+
+            <Label Text="{Binding Item.OwnerName, StringFormat='Owner: {0}'}"
+                   FontSize="14" />
+
+            <Label Text="{Binding Item.DailyRate, StringFormat='£{0:F2} / day'}"
+                   FontSize="18"
+                   FontAttributes="Bold" />
+
+            <Label Text="{Binding Item.IsAvailable, StringFormat='Available: {0}'}"
+                   FontSize="14" />
+
+            <Button Text="Edit Item"
+                    Command="{Binding NavigateToEditItemCommand}"
+                    TextColor="White"/>
+            <Button Text="Request Rental"
+                    Command="{Binding NavigateToRentalRequestCommand}"
+                    TextColor="White"/>
+
+            <Label Text="Reviews"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   Margin="0,15,0,0" />
+
+            <Label Text="{Binding AverageRating, StringFormat='Average rating: {0:F1}/5'}"
+                   FontSize="14" />
+
+            <Label Text="{Binding TotalReviews, StringFormat='Total reviews: {0}'}"
+                   FontSize="14" />
+
+            <Label Text="No reviews yet."
+                   FontSize="14"
+                   IsVisible="{Binding HasNoReviews}" />
+
+            <CollectionView ItemsSource="{Binding Reviews}"
+                            IsVisible="{Binding HasReviews}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeThickness="1"
+                                Padding="10"
+                                Margin="0,0,0,8">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding ReviewerName}"
+                                       FontAttributes="Bold" />
+
+                                <Label Text="{Binding RatingDisplay, StringFormat='Rating: {0}'}" />
+
+                                <Label Text="{Binding Comment}" />
+
+                                <Label Text="{Binding CreatedAtDisplay}"
+                                       FontSize="12"
+                                       Opacity="0.7" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

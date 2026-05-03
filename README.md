@@ -1,95 +1,87 @@
-<<<<<<< HEAD
 ---
-title: "StarterApp readme"
-parent: StarterApp
+title: "RentalApp readme"
+parent: RentalApp
 grand_parent: C# practice
 nav_order: 5
 mermaid: true
 ---
 
-# StarterApp
+# RentalApp
 
-The purpose of this app is to act as a starting point for further development. It provides some
-basic features including:
+The purpose of this app is to provide a .NET MAUI rental marketplace client. It has grown from the
+StarterApp template into an Android-focused app for browsing items, creating listings, requesting
+rentals, managing rental status, and reviewing completed rentals. It provides features including:
 
-* Database integration and migrations
-* Role-based security
-* Local authentication
-* Example navigation
+* Login and registration through the SET09102 API
+* Item browsing, item creation, item editing, categories, reviews, and nearby-item search
+* Rental request creation plus incoming and outgoing rental management
+* Rental status rules implemented in `StarterApp.Core`
+* PostgreSQL / Entity Framework Core migration support for the optional local database project
+* xUnit tests for item validation, review validation, rental pricing, overdue rules, and rental state transitions
 
-This version of the app uses PostgreSQL for data storage and Entity Framework Core for object-relational mapping
-and migrations.
+The mobile app currently targets Android using .NET MAUI and .NET 10. The main rental, item, review,
+category, nearby-search, and authentication workflows call the remote SET09102 API at
+`https://set09102-api.b-davison.workers.dev`. The solution also contains a PostgreSQL-backed Entity
+Framework Core database project and a separate migrations runner for local development, schema practice,
+and coursework architecture evidence. The hosted API should be treated as the primary backend for the
+implemented mobile app features.
 
-To fully understand how it works, you should follow an appropriate set of tutorials such as 
-[this one](https://edinburgh-napier.github.io/SET09102/tutorials/csharp/) which covers all of the main
+To fully understand how it works, you should follow an appropriate set of tutorials such as
+[this one](https://edinburgh-napier.github.io/SET09102/tutorials/csharp/) which covers the main
 concepts and techniques used here. However, if you want to jump straight in and work out any problems
-as you go along, that will also work. The code uses structured comments for use with the 
-[Doxygen](https://www.doxygen.nl/) documentation generator tool. 
+as you go along, that will also work. The main app follows the MAUI + MVVM pattern, with services and
+repositories handling API access and `StarterApp.Core` holding the domain rules that are covered by
+unit tests.
 
-You can use any development environment with this project including
+You can use any development environment with this project including:
 
 * [Rider](https://www.jetbrains.com/rider/)
 * [Visual Studio](https://visualstudio.microsoft.com/)
 * [Visual Studio Code](https://code.visualstudio.com/)
 
-The instructions assume you will be using VSCode since that is a lowest-common-denominator choice.
+The instructions assume you will be using VS Code since that is the lowest-common-denominator choice.
+
+## Project Reality
+
+This project contains both remote API-backed app functionality and local database/migration support.
+
+The implemented mobile marketplace features primarily use the hosted SET09102 API. This means the app
+does not require a locally hosted API server for normal mobile development. The local PostgreSQL database
+exists as part of the StarterApp/coursework structure and is useful for migrations, schema practice,
+database evidence, and local development work, but it is not the main runtime data source for the
+implemented app workflows.
+
+In practical terms:
+
+* Use the hosted API for app features.
+* Use the local database project for EF Core migration/schema work.
+* Do not debug PostgreSQL first when an API-backed app feature fails.
+* Check API requests, JWT tokens, endpoint URLs, and request bodies first.
+* Keep the local database configuration consistent with `docker-compose.yml`.
 
 ## Compatibility
 
 This app is built using the following tool versions.
 
-| Name                                                                                      | Version     |
-|-------------------------------------------------------------------------------------------|-------------|
-| [.NET](https://dotnet.microsoft.com/en-us/)                                               | 8.0 / 9.0   |
-| [PostgreSQL Docker image](https://hub.docker.com/_/postgres)                              | 16          |
+| Name | Version |
+|---|---:|
+| [.NET](https://dotnet.microsoft.com/en-us/) | 10.0 |
+| [.NET MAUI workload](https://learn.microsoft.com/dotnet/maui/) | Android |
+| [PostgreSQL Docker image](https://hub.docker.com/_/postgres) | 16 |
 
+## Architecture Overview
 
-## Getting started
+The app follows an MVVM-style structure with service and repository/API-client abstractions.
 
-### Prerequisites
+The main runtime flow is:
 
-Before using this app, ensure you have:
-
-1. **.NET SDK 8.0** or later installed
-2. **Docker** installed and running
-3. **PostgreSQL container** running (see [dev-environment tutorial](https://edinburgh-napier.github.io/SET09102/tutorials/csharp/dev-environment/))
-
-### Configuration
-
-1. Copy `StarterApp.Database/appsettings.json.template` to `StarterApp.Database/appsettings.json`
-2. Update the connection string with your PostgreSQL credentials:
-   ```json
-   {
-     "ConnectionStrings": {
-       "DevelopmentConnection": "Host=localhost;Username=student_user;Password=password123;Database=starterapp"
-     }
-   }
-   ```
-
-### Initial Setup
-
-1. Navigate to the Migrations project and create the initial migration:
-   ```bash
-   cd StarterApp.Migrations
-   dotnet ef migrations add InitialCreate
-   ```
-
-2. Apply the migration to create the database:
-   ```bash
-   dotnet ef database update
-   ```
-
-3. Build and run the application:
-   ```bash
-   cd ../StarterApp
-   dotnet build
-   dotnet run
-   ```
-
-### Tutorial
-
-For a comprehensive guide on using this app and understanding its architecture, see the
-[MAUI + MVVM + Database Tutorial](https://edinburgh-napier.github.io/SET09102/tutorials/csharp/maui-mvvm-database/).
-=======
-# RentalApp
->>>>>>> 246494c84e10338d5f66597a961f4ed7370a1e39
+```text
+Views
+↓
+ViewModels
+↓
+Services
+↓
+Repositories / API Client
+↓
+Hosted SET09102 API

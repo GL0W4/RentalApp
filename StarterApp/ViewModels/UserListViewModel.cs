@@ -214,7 +214,7 @@ public partial class UserListViewModel : INotifyPropertyChanged
     /// This property is used for conditional UI display and access control.
     /// Only admin users can access the user list functionality.
     /// </remarks>
-    public bool IsAdmin => _authenticationService.HasRole(RoleConstants.Admin);
+    public bool IsAdmin => false;
 
     /// <summary>Gets the command for loading users from the database</summary>
     /// <value>Command that executes LoadUsersAsync when invoked</value>
