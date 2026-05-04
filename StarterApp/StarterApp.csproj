@@ -39,6 +39,14 @@
 		-->
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<RuntimeIdentifier>android-x64</RuntimeIdentifier>
+  		<AndroidLinkMode>None</AndroidLinkMode>
+  		<PublishTrimmed>false</PublishTrimmed>
+		<TrimMode>copyused</TrimMode>
+  		<RunAOTCompilation>false</RunAOTCompilation>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />

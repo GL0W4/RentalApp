@@ -33,7 +33,7 @@ public class AuthenticationService : IAuthenticationService
     {
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri("https://set09102-api.b-davison.workers.dev")
+            BaseAddress = new Uri(ApiConstants.BaseUrl)
         };
     }
 
